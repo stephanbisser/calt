@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AgentLens Configuration",
+  "description": "Configuration file for AgentLens – M365 Copilot Agent linter and validator",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "rules": {
+      "type": "object",
+      "description": "Override rule severities. Keys are rule IDs (e.g. INST-005), values are 'error', 'warning', 'info', or 'off'.",
+      "additionalProperties": {
+        "type": "string",
+        "enum": ["error", "warning", "info", "off"]
+      }
+    },
+    "instruction_min_length": {
+      "type": "number",
+      "description": "Minimum recommended instruction length in characters",
+      "default": 200,
+      "minimum": 0
+    },
+    "instruction_ideal_range": {
+      "type": "array",
+      "description": "Ideal instruction length range [min, max] in characters",
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 2,
+      "default": [500, 4000]
+    },
+    "custom_blocked_phrases": {
+      "type": "array",
+      "description": "Custom phrases that should not appear in instructions",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "require_conversation_starters_min": {
+      "type": "number",
+      "description": "Minimum number of conversation starters required",
+      "default": 2,
+      "minimum": 0
+    },
+    "schema_version_target": {
+      "type": "string",
+      "description": "Target schema version for upgrade recommendations",
+      "default": "v1.6",
+      "enum": ["v1.0", "v1.1", "v1.2", "v1.3", "v1.4", "v1.5", "v1.6"]
+    },
+    "graph_api": {
+      "type": "object",
+      "description": "Microsoft Graph API configuration",
+      "properties": {
+        "client_id": {
+          "type": "string",
+          "description": "Entra App Registration client ID for Graph API access"
+        },
+        "tenant_id": {
+          "type": "string",
+          "description": "Entra tenant ID"
+        }
+      }
+    }
+  }
+}

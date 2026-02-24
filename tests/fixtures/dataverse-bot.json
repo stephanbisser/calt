@@ -1,0 +1,9 @@
+{
+  "botid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "name": "Customer Service Bot",
+  "description": "A helpful customer service agent for answering support questions.",
+  "createdon": "2025-01-15T10:30:00Z",
+  "modifiedon": "2025-06-20T14:45:00Z",
+  "schemaname": "cr7f8_customerServiceBot",
+  "statecode": 0
+}

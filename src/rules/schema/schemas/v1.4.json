@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Declarative Agent Manifest v1.4",
+  "type": "object",
+  "required": ["version", "name", "description", "instructions"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": { "type": "string" },
+    "version": { "type": "string", "enum": ["v1.0", "v1.1", "v1.2", "v1.3", "v1.4"] },
+    "name": { "type": "string", "maxLength": 100 },
+    "description": { "type": "string", "maxLength": 1000 },
+    "instructions": { "type": "string", "maxLength": 8000, "minLength": 1 },
+    "conversation_starters": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "required": ["text"],
+        "properties": {
+          "title": { "type": "string" },
+          "text": { "type": "string" }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["WebSearch", "OneDriveAndSharePoint", "GraphConnectors", "GraphicArt", "CodeInterpreter", "Dataverse"]
+          }
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "file"],
+        "properties": {
+          "id": { "type": "string" },
+          "file": { "type": "string" }
+        }
+      }
+    },
+    "behavior_overrides": {
+      "type": "object",
+      "properties": {
+        "suggestions": {
+          "type": "object",
+          "properties": { "disabled": { "type": "boolean" } }
+        },
+        "special_instructions": {
+          "type": "object",
+          "properties": { "discourage_model_knowledge": { "type": "boolean" } }
+        }
+      }
+    }
+  }
+}

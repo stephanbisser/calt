@@ -1,0 +1,6 @@
+{
+  "version": "v1.3",
+  "name": "Minimal Agent",
+  "description": "A minimal agent",
+  "instructions": "Help the user."
+}

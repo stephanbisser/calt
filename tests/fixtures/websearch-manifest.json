@@ -1,0 +1,18 @@
+{
+  "version": "v1.5",
+  "name": "Web Search Agent",
+  "description": "An agent that uses web search",
+  "instructions": "Search the web for information and help users find answers.",
+  "capabilities": [
+    {
+      "name": "WebSearch",
+      "sites": [
+        { "url": "https://docs.microsoft.com/en-us" },
+        { "url": "https://learn.microsoft.com" },
+        { "url": "https://stackoverflow.com" },
+        { "url": "https://github.com" },
+        { "url": "https://example.com/too/many/path/segments?query=bad" }
+      ]
+    }
+  ]
+}

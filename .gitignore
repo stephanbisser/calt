@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.js.map
+*.d.ts.map
+.agentlensrc.json
+*.tsbuildinfo
+coverage/
+.DS_Store
+docs/
+.env*
+.claude/

@@ -1,0 +1,14 @@
+{
+  "version": "v1.5",
+  "name": "Bad Instructions Agent",
+  "description": "An agent with poor instruction quality for testing",
+  "instructions": "Help users. Maybe try to answer questions if possible. Sometimes provide info.",
+  "capabilities": [
+    { "name": "WebSearch" },
+    { "name": "OneDriveAndSharePoint", "items_by_url": [{ "url": "https://contoso.sharepoint.com/sites/docs" }] },
+    { "name": "GraphicArt" }
+  ],
+  "conversation_starters": [
+    { "text": "Tell me about quantum physics" }
+  ]
+}

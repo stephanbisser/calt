@@ -1,0 +1,26 @@
+openapi: "3.0.3"
+info:
+  title: Task Manager API
+  description: API for managing tasks and projects
+  version: "1.0.0"
+paths:
+  /tasks:
+    get:
+      operationId: listTasks
+      summary: List all tasks
+      responses:
+        "200":
+          description: OK
+    post:
+      operationId: createTask
+      summary: Create a new task
+      responses:
+        "201":
+          description: Created
+  /tasks/{id}:
+    get:
+      operationId: getTask
+      summary: Get a task by ID
+      responses:
+        "200":
+          description: OK
