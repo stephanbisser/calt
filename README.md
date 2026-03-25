@@ -4,46 +4,23 @@ Lint, validate, and analyze **Microsoft 365 Copilot Agent** configurations — l
 
 AgentLens helps Makers and Pro Developers check the quality of their Declarative Agent, Copilot Studio Agent, and Custom Engine Agent configurations **before** they deploy.
 
+> **Note:** Scanning Agent Builder agents from your tenant uses a **beta Microsoft Graph API endpoint** (`/beta/copilot/admin/catalog/packages`). This endpoint may not yet be available in all tenants or regions. Local file scanning works independently of the Graph API.
+
 ## Quick Start
 
 ```bash
-# Install dependencies
-npm install
+# Install globally
+npm install -g agentlens
 
-# Build
-npm run build
+# Scan a local agent manifest
+agentlens scan ./path/to/declarativeAgent.json
 
-# Run against a local manifest
-node dist/index.js scan ./tests/fixtures/valid-manifest.json
+# Scan a project folder (auto-detects appPackage/ etc.)
+agentlens scan ./my-agent-project
 
-# Run against a manifest with issues
-node dist/index.js scan ./tests/fixtures/bad-instructions-manifest.json
+# Scan with auto-fix
+agentlens scan --fix ./declarativeAgent.json
 ```
-
-## Running Tests
-
-```bash
-# Run all 104 tests (10 test files)
-npm test
-
-# Watch mode — re-runs on file changes
-npm run test:watch
-```
-
-Test coverage:
-
-| Test File | What it covers |
-|-----------|----------------|
-| `tests/graph/transform.test.ts` | Parsing Graph API responses, extracting manifests from escaped JSON `definition` fields, slugify |
-| `tests/rules/instruction-rules.test.ts` | All 15 instruction lint rules (INST-001 – INST-015) |
-| `tests/rules/knowledge-rules.test.ts` | SharePoint URL validation, WebSearch site limits, GraphConnector checks |
-| `tests/rules/schema-rules.test.ts` | AJV schema validation against v1.3 – v1.6, required fields, field length |
-| `tests/rules/starter-rules.test.ts` | Conversation starter min/max count, duplicates, empty text |
-| `tests/rules/rule-engine.test.ts` | Full scan orchestration, instruction-only lint, config override integration |
-| `tests/core/project-detector.test.ts` | Auto-detection of Agents Toolkit, Teams Toolkit, standalone JSON, nested dirs |
-| `tests/core/config-loader.test.ts` | Loading `.agentlensrc.json`, merging with defaults, severity overrides |
-| `tests/core/markdown-parser.test.ts` | Header/list/bold detection, section detection (EN + DE) |
-| `tests/utils/url-validator.test.ts` | SharePoint URL checks, path segment counting, query parameter detection |
 
 ## CLI Commands
 
@@ -51,35 +28,58 @@ Test coverage:
 
 ```bash
 # Scan a local manifest file
-node dist/index.js scan ./path/to/declarativeAgent.json
+agentlens scan ./path/to/declarativeAgent.json
 
 # Scan a project folder (auto-detects appPackage/ etc.)
-node dist/index.js scan ./my-agent-project
+agentlens scan ./my-agent-project
 
 # Scan the current directory
-node dist/index.js scan
+agentlens scan
 
 # Output as JSON (for CI/CD)
-node dist/index.js scan ./declarativeAgent.json --format json
+agentlens scan ./declarativeAgent.json --format json
 
-# Verbose output
-node dist/index.js scan ./declarativeAgent.json --verbose
+# Verbose output (shows all passed checks)
+agentlens scan ./declarativeAgent.json --verbose
+
+# Auto-fix applicable issues
+agentlens scan --fix ./declarativeAgent.json
 ```
 
 ### Lint — instruction quality only
 
 ```bash
 # Lint a local manifest
-node dist/index.js lint ./declarativeAgent.json
+agentlens lint ./declarativeAgent.json
 
 # JSON output
-node dist/index.js lint ./declarativeAgent.json --format json
+agentlens lint ./declarativeAgent.json --format json
 ```
 
 ### Validate — schema only
 
 ```bash
-node dist/index.js validate ./declarativeAgent.json
+agentlens validate ./declarativeAgent.json
+```
+
+### Fix — auto-fix issues
+
+```bash
+# Auto-fix applicable issues
+agentlens fix ./declarativeAgent.json
+
+# Preview fixes without modifying files
+agentlens fix --dry-run ./declarativeAgent.json
+```
+
+### Diff — compare two agents
+
+```bash
+# Compare two local manifests
+agentlens diff ./agentA.json ./agentB.json
+
+# Compare local vs remote
+agentlens diff ./local.json T_cebfd158-7116-1e34-27f5-0efca5f046f0
 ```
 
 ### Fetch — load agents from your M365 Tenant
@@ -88,20 +88,23 @@ Requires authentication first (see below).
 
 ```bash
 # List all Copilot agents in the tenant
-node dist/index.js fetch --list
+agentlens fetch --list
 
 # Download a specific agent as a local JSON file
-node dist/index.js fetch --id T_cebfd158-7116-1e34-27f5-0efca5f046f0
+agentlens fetch --id T_cebfd158-7116-1e34-27f5-0efca5f046f0
 
 # Download all agents into a folder
-node dist/index.js fetch --all --output ./agents/
+agentlens fetch --all --output ./agents/
+
+# Filter by agent type
+agentlens fetch --list --type copilot-studio
 ```
 
 ### Scan remote agents directly (fetch + scan in one step)
 
 ```bash
-node dist/index.js scan --remote --id T_cebfd158-7116-1e34-27f5-0efca5f046f0
-node dist/index.js scan --remote --all
+agentlens scan --remote --id T_cebfd158-7116-1e34-27f5-0efca5f046f0
+agentlens scan --remote --all
 ```
 
 ### Login / Logout — M365 authentication
@@ -110,19 +113,22 @@ Uses Device Code Flow via MSAL. Tokens are cached in `~/.agentlens/token-cache.j
 
 ```bash
 # Interactive login
-node dist/index.js login
+agentlens login
 
 # Login with a specific tenant
-node dist/index.js login --tenant YOUR_TENANT_ID
+agentlens login --tenant YOUR_TENANT_ID
 
 # Use a custom Entra App Registration
-node dist/index.js login --client-id YOUR_CLIENT_ID
+agentlens login --client-id YOUR_CLIENT_ID
 
 # Check login status
-node dist/index.js login --status
+agentlens login --status
+
+# Check login status with token details
+agentlens login --status --verbose
 
 # Clear cached tokens
-node dist/index.js logout
+agentlens logout
 ```
 
 > **Required permission:** `CopilotPackages.Read.All` (Delegated, Work or School Account — no admin consent required)
@@ -131,14 +137,27 @@ node dist/index.js logout
 > 1. Azure Portal → **Entra ID** → **App registrations** → **New registration**
 > 2. **Authentication** → Add platform → **Mobile and desktop applications** → enable device code flow (`https://login.microsoftonline.com/common/oauth2/nativeclient`)
 > 3. **API permissions** → Add → **Microsoft Graph** → **Delegated** → `CopilotPackages.Read.All`
-> 4. Login: `node dist/index.js login --client-id <YOUR_APP_ID> --tenant <YOUR_TENANT_ID>`
+> 4. Login: `agentlens login --client-id <YOUR_APP_ID> --tenant <YOUR_TENANT_ID>`
 >
 > You can persist these in `.agentlensrc.json` under `graph_api.client_id` and `graph_api.tenant_id`.
+
+### Setup — register Entra App interactively
+
+```bash
+# Interactive setup (creates config + registers Entra App via Azure CLI)
+agentlens setup
+
+# With a custom app name
+agentlens setup --app-name "My AgentLens"
+
+# Login immediately after setup
+agentlens setup --login
+```
 
 ### Init — create a config file
 
 ```bash
-node dist/index.js init
+agentlens init
 ```
 
 Creates a `.agentlensrc.json` in the current directory:
@@ -151,10 +170,8 @@ Creates a `.agentlensrc.json` in the current directory:
   "custom_blocked_phrases": [],
   "require_conversation_starters_min": 2,
   "schema_version_target": "v1.6",
-  "graph_api": {
-    "client_id": "",
-    "tenant_id": ""
-  }
+  "graph_api": {},
+  "dataverse": {}
 }
 ```
 
@@ -173,16 +190,16 @@ Override any rule severity or turn rules off:
 
 ```bash
 # JSON report
-node dist/index.js report ./declarativeAgent.json --format json
+agentlens report ./declarativeAgent.json --format json
 
 # Markdown report
-node dist/index.js report ./declarativeAgent.json --format markdown
+agentlens report ./declarativeAgent.json --format markdown
 
 # HTML report saved to file
-node dist/index.js report ./declarativeAgent.json --format html --output report.html
+agentlens report ./declarativeAgent.json --format html --output report.html
 
 # Report all remote agents
-node dist/index.js report --remote --all --format markdown
+agentlens report --remote --all --format markdown
 ```
 
 ## Lint Rules Reference
@@ -259,7 +276,7 @@ AgentLens exits with code `1` when errors are found, making it usable as a CI ga
 agentlens/
 ├── src/
 │   ├── index.ts                    # CLI entry point (commander)
-│   ├── commands/                   # scan, lint, validate, fetch, login, init, report
+│   ├── commands/                   # scan, lint, validate, fix, diff, fetch, login, init, setup, report
 │   ├── core/
 │   │   ├── types.ts                # All TypeScript interfaces
 │   │   ├── index.ts                # Public API (for VS Code extension reuse)
@@ -270,20 +287,25 @@ agentlens/
 │   │   ├── auth.ts                 # MSAL Device Code Flow + token cache
 │   │   ├── client.ts               # Graph API client with pagination
 │   │   └── transform.ts            # Graph response → manifest
+│   ├── dataverse/
+│   │   ├── auth.ts                 # Dataverse authentication
+│   │   ├── client.ts               # Dataverse API client
+│   │   └── transform.ts            # Bot → manifest transform
 │   ├── rules/
 │   │   ├── rule-engine.ts          # Orchestrates all checks
 │   │   ├── schema/                 # AJV validation + embedded JSON schemas
 │   │   ├── instructions/           # INST-001 through INST-015
 │   │   ├── knowledge/              # SharePoint, WebSearch, Connector rules
 │   │   ├── actions/                # Plugin file checks
-│   │   └── conversation-starters/  # Starter validation
+│   │   ├── conversation-starters/  # Starter validation
+│   │   └── security/               # OWASP LLM Top 10 rules
 │   ├── formatters/                 # terminal (chalk), json, markdown, html
 │   └── utils/                      # URL validator, Markdown parser
 ├── schemas/
 │   └── config.schema.json          # JSON Schema for .agentlensrc.json
 ├── tests/
 │   ├── fixtures/                   # Sample manifests + Graph API response
-│   ├── core/                       # project-detector, config-loader, markdown-parser
+│   ├── core/                       # project-detector, config-loader, markdown-parser, manifest-loader
 │   ├── graph/                      # transform tests
 │   ├── rules/                      # All rule tests + rule-engine integration
 │   └── utils/                      # URL validator tests
@@ -292,35 +314,34 @@ agentlens/
 └── vitest.config.ts
 ```
 
-## Test Fixtures
-
-The `tests/fixtures/` folder contains sample files you can use for testing:
-
-| File | Description |
-|------|-------------|
-| `valid-manifest.json` | Well-structured agent with all best practices |
-| `minimal-manifest.json` | Bare minimum v1.3 manifest |
-| `bad-instructions-manifest.json` | Poor instruction quality (vague language, no structure) |
-| `invalid-manifest.json` | Missing required fields, name too long |
-| `websearch-manifest.json` | WebSearch with too many sites and bad URLs |
-| `graph-api-response.json` | Real Graph API response with escaped `definition` JSON |
-
 ## Development
 
 ```bash
+# Clone and install
+git clone https://github.com/stephanbisser/agentlens.git
+cd agentlens
+npm install
+
 # Run in dev mode (no build step, uses tsx)
 npm run dev -- scan ./tests/fixtures/valid-manifest.json
 
-# Type-check without building
-npx tsc --noEmit
-
 # Build to dist/
 npm run build
+
+# Run tests
+npm test
+
+# Lint
+npm run lint
 ```
 
 ## Token Security
 
 Authentication tokens are stored in `~/.agentlens/token-cache.json` with file permissions `0600` (owner-only read/write). Do not commit this directory to version control.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
