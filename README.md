@@ -36,7 +36,13 @@ calt scan --fix ./declarativeAgent.json
 
 ### Tenant scanning (requires setup)
 
-To scan agents deployed in your M365 tenant (Agent Builder + Copilot Studio), you need to register an Entra App first. There are two ways:
+To scan agents deployed in your M365 tenant (Agent Builder + Copilot Studio), you need to register an Entra App first.
+
+> **Note:** The Graph API endpoint for tenant scanning (`/beta/copilot/admin/catalog/packages`) requires an Entra admin role — **AI Administrator** (recommended) or **Global Administrator**. Regular user accounts will get a 403 Forbidden even with admin-consented permissions. This is a [Microsoft Graph API limitation](https://learn.microsoft.com/en-us/microsoft-365-copilot/extensibility/api/admin-settings/package/copilotpackages-list) — there is currently no user-scoped endpoint for reading declarative agent manifests.
+>
+> **Alternative for non-admin users:** Export your agent from Agent Builder and scan it locally with `calt scan ./declarativeAgent.json`.
+
+There are two ways to set up:
 
 **Option A: Automated setup (requires [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli))**
 
@@ -49,9 +55,10 @@ calt setup --login          # Creates Entra App, config, and logs in
 
 1. Azure Portal → **Entra ID** → **App registrations** → **New registration**
 2. **Authentication** → Add platform → **Mobile and desktop applications** → enable `https://login.microsoftonline.com/common/oauth2/nativeclient`
-3. **API permissions** → Add → **Microsoft Graph** → **Delegated** → `CopilotPackages.Read.All`
-4. For Copilot Studio: also add **Dynamics CRM** → **Delegated** → `user_impersonation`
-5. Run:
+3. **Authentication** → Advanced settings → **Allow public client flows** → **Yes** (required for Device Code Flow)
+4. **API permissions** → Add → **Microsoft Graph** → **Delegated** → `CopilotPackages.Read.All` → click **Grant admin consent**
+5. For Copilot Studio: also add **Dynamics CRM** → **Delegated** → `user_impersonation`
+6. Run:
 ```bash
 calt init
 calt login --client-id <YOUR_APP_ID> --tenant <YOUR_TENANT_ID>

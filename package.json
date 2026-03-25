@@ -1,6 +1,6 @@
 {
   "name": "calt-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CALT — Copilot Agent Lint Tool: Lint, validate, and analyze Microsoft 365 Copilot Agent configurations – locally or directly from your tenant",
   "type": "module",
   "bin": {

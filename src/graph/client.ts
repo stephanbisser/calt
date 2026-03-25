@@ -26,7 +26,11 @@ export class GraphClient {
       }
       if (response.status === 403) {
         throw new GraphApiError(
-          "Forbidden. Ensure your account has the CopilotPackages.Read.All permission.",
+          "Forbidden. The /copilot/admin/catalog/packages endpoint requires an Entra admin role.\n" +
+          "Assign one of these roles to your account in the Azure Portal → Entra ID → Roles:\n" +
+          "  • AI Administrator (least-privilege, recommended)\n" +
+          "  • Global Administrator\n" +
+          "Also ensure CopilotPackages.Read.All has admin consent on your app registration.",
           response.status,
         );
       }
