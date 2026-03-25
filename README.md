@@ -9,11 +9,16 @@ CALT helps Makers and Pro Developers check the quality of their Declarative Agen
 ## Quick Start
 
 ```bash
-# Install globally
 npm install -g calt-cli
+```
 
-# Scan a local agent manifest
-calt scan ./path/to/declarativeAgent.json
+### Local scanning (no setup required)
+
+Scan local Declarative Agent manifests right away — no authentication or configuration needed:
+
+```bash
+# Scan a manifest file
+calt scan ./declarativeAgent.json
 
 # Scan a project folder (auto-detects appPackage/ etc.)
 calt scan ./my-agent-project
@@ -22,37 +27,68 @@ calt scan ./my-agent-project
 calt scan --fix ./declarativeAgent.json
 ```
 
-## CLI Commands
+### Tenant scanning (requires setup)
 
-### Scan — run all checks
+To scan agents deployed in your M365 tenant (Agent Builder + Copilot Studio), you need to register an Entra App first. There are two ways:
+
+**Option A: Automated setup (requires [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli))**
 
 ```bash
-# Scan a local manifest file
-calt scan ./path/to/declarativeAgent.json
+az login                    # Login to Azure CLI first
+calt setup --login          # Creates Entra App, config, and logs in
+```
 
-# Scan a project folder (auto-detects appPackage/ etc.)
-calt scan ./my-agent-project
+**Option B: Manual setup (no Azure CLI needed)**
 
-# Scan the current directory
-calt scan
+1. Azure Portal → **Entra ID** → **App registrations** → **New registration**
+2. **Authentication** → Add platform → **Mobile and desktop applications** → enable `https://login.microsoftonline.com/common/oauth2/nativeclient`
+3. **API permissions** → Add → **Microsoft Graph** → **Delegated** → `CopilotPackages.Read.All`
+4. For Copilot Studio: also add **Dynamics CRM** → **Delegated** → `user_impersonation`
+5. Run:
+```bash
+calt init
+calt login --client-id <YOUR_APP_ID> --tenant <YOUR_TENANT_ID>
+```
 
-# Output as JSON (for CI/CD)
-calt scan ./declarativeAgent.json --format json
+Once authenticated, you can scan your tenant:
 
-# Verbose output (shows all passed checks)
-calt scan ./declarativeAgent.json --verbose
+```bash
+# List all agents in your tenant
+calt fetch --list
 
-# Auto-fix applicable issues
-calt scan --fix ./declarativeAgent.json
+# Scan all Agent Builder agents
+calt scan --remote --all --type agent-builder
+
+# Scan all Copilot Studio agents
+calt scan --remote --all --type copilot-studio
+
+# Scan a specific agent by ID
+calt scan --remote --id T_cebfd158-7116-1e34-27f5-0efca5f046f0
+
+# Download all agents locally
+calt fetch --all --output ./agents/
+```
+
+## CLI Commands
+
+### Scan
+
+```bash
+calt scan ./declarativeAgent.json              # Scan a local manifest
+calt scan ./my-agent-project                   # Scan a project folder
+calt scan                                      # Scan current directory
+calt scan --format json                        # JSON output (for CI/CD)
+calt scan --verbose                            # Show all passed checks
+calt scan --fix ./declarativeAgent.json        # Auto-fix issues
+calt scan --remote --all                       # Scan all tenant agents
+calt scan --remote --all --type copilot-studio # Scan Copilot Studio agents only
+calt scan --remote --all --type agent-builder  # Scan Agent Builder agents only
 ```
 
 ### Lint — instruction quality only
 
 ```bash
-# Lint a local manifest
 calt lint ./declarativeAgent.json
-
-# JSON output
 calt lint ./declarativeAgent.json --format json
 ```
 
@@ -65,102 +101,57 @@ calt validate ./declarativeAgent.json
 ### Fix — auto-fix issues
 
 ```bash
-# Auto-fix applicable issues
-calt fix ./declarativeAgent.json
-
-# Preview fixes without modifying files
-calt fix --dry-run ./declarativeAgent.json
+calt fix ./declarativeAgent.json               # Apply fixes
+calt fix --dry-run ./declarativeAgent.json     # Preview without modifying
 ```
 
 ### Diff — compare two agents
 
 ```bash
-# Compare two local manifests
-calt diff ./agentA.json ./agentB.json
-
-# Compare local vs remote
-calt diff ./local.json T_cebfd158-7116-1e34-27f5-0efca5f046f0
+calt diff ./agentA.json ./agentB.json          # Local vs local
+calt diff ./local.json T_cebfd158-...          # Local vs remote
 ```
 
-### Fetch — load agents from your M365 Tenant
-
-Requires authentication first (see below).
+### Fetch — download agents from tenant
 
 ```bash
-# List all Copilot agents in the tenant
-calt fetch --list
-
-# Download a specific agent as a local JSON file
-calt fetch --id T_cebfd158-7116-1e34-27f5-0efca5f046f0
-
-# Download all agents into a folder
-calt fetch --all --output ./agents/
-
-# Filter by agent type
-calt fetch --list --type copilot-studio
+calt fetch --list                              # List all agents
+calt fetch --list --type copilot-studio        # List Copilot Studio agents
+calt fetch --list --type agent-builder         # List Agent Builder agents
+calt fetch --id T_cebfd158-... --output ./     # Download specific agent
+calt fetch --all --output ./agents/            # Download all agents
 ```
 
-### Scan remote agents directly (fetch + scan in one step)
+### Login / Logout
 
 ```bash
-calt scan --remote --id T_cebfd158-7116-1e34-27f5-0efca5f046f0
-calt scan --remote --all
+calt login                                     # Interactive login (Device Code Flow)
+calt login --client-id <ID> --tenant <TID>     # With specific app
+calt login --status                            # Check login status
+calt login --status --verbose                  # Show token details
+calt logout                                    # Clear cached tokens
 ```
 
-### Login / Logout — M365 authentication
-
-Uses Device Code Flow via MSAL. Tokens are cached in `~/.calt/token-cache.json`.
+### Setup / Init
 
 ```bash
-# Interactive login
-calt login
-
-# Login with a specific tenant
-calt login --tenant YOUR_TENANT_ID
-
-# Use a custom Entra App Registration
-calt login --client-id YOUR_CLIENT_ID
-
-# Check login status
-calt login --status
-
-# Check login status with token details
-calt login --status --verbose
-
-# Clear cached tokens
-calt logout
+calt setup                                     # Automated Entra App registration (needs Azure CLI)
+calt setup --login                             # Setup + login in one step
+calt init                                      # Create .caltrc.json config only
 ```
 
-> **Required permission:** `CopilotPackages.Read.All` (Delegated, Work or School Account — no admin consent required)
->
-> The built-in client ID does not have this permission pre-configured. You need to register your own Entra ID app:
-> 1. Azure Portal → **Entra ID** → **App registrations** → **New registration**
-> 2. **Authentication** → Add platform → **Mobile and desktop applications** → enable device code flow (`https://login.microsoftonline.com/common/oauth2/nativeclient`)
-> 3. **API permissions** → Add → **Microsoft Graph** → **Delegated** → `CopilotPackages.Read.All`
-> 4. Login: `calt login --client-id <YOUR_APP_ID> --tenant <YOUR_TENANT_ID>`
->
-> You can persist these in `.caltrc.json` under `graph_api.client_id` and `graph_api.tenant_id`.
-
-### Setup — register Entra App interactively
+### Report — export results
 
 ```bash
-# Interactive setup (creates config + registers Entra App via Azure CLI)
-calt setup
-
-# With a custom app name
-calt setup --app-name "My CALT"
-
-# Login immediately after setup
-calt setup --login
+calt report ./declarativeAgent.json --format json
+calt report ./declarativeAgent.json --format markdown
+calt report ./declarativeAgent.json --format html --output report.html
+calt report --remote --all --format markdown
 ```
 
-### Init — create a config file
+## Configuration
 
-```bash
-calt init
-```
-
-Creates a `.caltrc.json` in the current directory:
+Run `calt init` to create a `.caltrc.json`:
 
 ```json
 {
@@ -170,12 +161,17 @@ Creates a `.caltrc.json` in the current directory:
   "custom_blocked_phrases": [],
   "require_conversation_starters_min": 2,
   "schema_version_target": "v1.6",
-  "graph_api": {},
-  "dataverse": {}
+  "graph_api": {
+    "client_id": "",
+    "tenant_id": ""
+  },
+  "dataverse": {
+    "org_urls": []
+  }
 }
 ```
 
-Override any rule severity or turn rules off:
+Override rule severities or turn rules off:
 
 ```json
 {
@@ -184,22 +180,6 @@ Override any rule severity or turn rules off:
     "INST-010": "warning"
   }
 }
-```
-
-### Report — export in different formats
-
-```bash
-# JSON report
-calt report ./declarativeAgent.json --format json
-
-# Markdown report
-calt report ./declarativeAgent.json --format markdown
-
-# HTML report saved to file
-calt report ./declarativeAgent.json --format html --output report.html
-
-# Report all remote agents
-calt report --remote --all --format markdown
 ```
 
 ## Lint Rules Reference
@@ -319,7 +299,7 @@ agentlens/
 ```bash
 # Clone and install
 git clone https://github.com/stephanbisser/calt.git
-cd agentlens
+cd calt
 npm install
 
 # Run in dev mode (no build step, uses tsx)
