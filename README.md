@@ -6,6 +6,13 @@ CALT helps Makers and Pro Developers check the quality of their Declarative Agen
 
 > **Note:** Scanning Agent Builder agents from your tenant uses a **beta Microsoft Graph API endpoint** (`/beta/copilot/admin/catalog/packages`). This endpoint may not yet be available in all tenants or regions. Local file scanning works independently of the Graph API.
 
+## Minimal Path to Awesome
+
+```bash
+npm install -g calt-cli          # 1. Install
+calt scan ./declarativeAgent.json # 2. Scan — done!
+```
+
 ## Quick Start
 
 ```bash
