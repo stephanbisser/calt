@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { DEFAULT_CONFIG, type AgentLensConfig } from "./types.js";
 
-const CONFIG_FILENAME = ".agentlensrc.json";
+const CONFIG_FILENAME = ".caltrc.json";
 
 export async function loadConfig(configPath?: string): Promise<AgentLensConfig> {
   const filePath = configPath ?? resolve(process.cwd(), CONFIG_FILENAME);

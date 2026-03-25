@@ -26,4 +26,4 @@ This policy applies to the CALT CLI tool and its npm package. It covers:
 
 ## Token Security
 
-CALT caches Microsoft authentication tokens locally at `~/.agentlens/token-cache.json` with file permissions `0600` (owner read/write only). Tokens are never transmitted to any service other than Microsoft's authentication and API endpoints.
+CALT caches Microsoft authentication tokens locally at `~/.calt/token-cache.json` with file permissions `0600` (owner read/write only). Tokens are never transmitted to any service other than Microsoft's authentication and API endpoints.

@@ -52,7 +52,7 @@ program
   .description("Authenticate with Microsoft 365 (Graph API + Dataverse if configured)")
   .option("--tenant <tenant-id>", "Specific Entra tenant ID")
   .option("--client-id <id>", "Custom Entra App Registration client ID")
-  .option("--config <path>", "Path to .agentlensrc.json")
+  .option("--config <path>", "Path to .caltrc.json")
   .option("--status", "Show current login status")
   .option("--verbose", "Show token scopes and claims (with --status)")
   .option("--raw", "Show full raw token (with --status --verbose)")
@@ -80,7 +80,7 @@ program
   .option("--id <package-id>", "Fetch a specific agent by package ID")
   .option("--all", "Fetch all agents from the tenant")
   .option("--output <dir>", "Output directory for fetched files")
-  .option("--config <path>", "Path to .agentlensrc.json")
+  .option("--config <path>", "Path to .caltrc.json")
   .option("--client-id <id>", "Custom Entra App client ID")
   .option("--tenant <tenant-id>", "Specific tenant ID")
   .addOption(
@@ -102,7 +102,7 @@ program
   .option("--remote", "Fetch agent from tenant instead of local file")
   .option("--id <package-id>", "Remote agent package ID (with --remote)")
   .option("--all", "Scan all agents from tenant (with --remote)")
-  .option("--config <path>", "Path to .agentlensrc.json")
+  .option("--config <path>", "Path to .caltrc.json")
   .option("--format <type>", "Output format: terminal, json, markdown", "terminal")
   .option("--verbose", "Show detailed output")
   .option("--fix", "Auto-fix applicable issues")
@@ -135,7 +135,7 @@ program
   .option("--remote", "Fetch agent from tenant instead of local file")
   .option("--id <package-id>", "Remote agent package ID (with --remote)")
   .option("--all", "Lint all agents from tenant (with --remote)")
-  .option("--config <path>", "Path to .agentlensrc.json")
+  .option("--config <path>", "Path to .caltrc.json")
   .option("--format <type>", "Output format: terminal, json, markdown", "terminal")
   .option("--client-id <id>", "Custom Entra App client ID")
   .option("--tenant <tenant-id>", "Specific tenant ID")
@@ -162,7 +162,7 @@ program
   .command("validate")
   .argument("[path]", "Path to agent manifest or project directory")
   .description("Validate agent manifest against official JSON Schema")
-  .option("--config <path>", "Path to .agentlensrc.json")
+  .option("--config <path>", "Path to .caltrc.json")
   .option("--format <type>", "Output format: terminal, json, markdown", "terminal")
   .option("--verbose", "Show detailed output")
   .action(withErrorHandler(async (path, options) => {
@@ -173,10 +173,10 @@ program
 
 program
   .command("setup")
-  .description("Create .agentlensrc.json, register an Entra ID app, and discover Power Platform environments")
+  .description("Create .caltrc.json, register an Entra ID app, and discover Power Platform environments")
   .option("--app-name <name>", "Display name for the app registration", "CALT")
   .option("--login", "Run 'calt login' immediately after setup")
-  .option("--force", "Overwrite existing .agentlensrc.json config file")
+  .option("--force", "Overwrite existing .caltrc.json config file")
   .action(withErrorHandler(async (options) => {
     await setupCommand(options);
   }));
@@ -192,7 +192,7 @@ program
   .option("--remote", "Fetch agent from tenant instead of local file")
   .option("--id <package-id>", "Remote agent package ID (with --remote)")
   .option("--all", "Report on all agents from tenant (with --remote)")
-  .option("--config <path>", "Path to .agentlensrc.json")
+  .option("--config <path>", "Path to .caltrc.json")
   .option("--client-id <id>", "Custom Entra App client ID")
   .option("--tenant <tenant-id>", "Specific tenant ID")
   .addOption(
@@ -213,7 +213,7 @@ program
   .argument("<source2>", "Second agent (file path or remote ID)")
   .description("Compare two agent configurations side by side")
   .option("--format <type>", "Output format: terminal, json, markdown", "terminal")
-  .option("--config <path>", "Path to .agentlensrc.json")
+  .option("--config <path>", "Path to .caltrc.json")
   .option("--client-id <id>", "Entra App client ID")
   .option("--tenant <id>", "Tenant ID")
   .option("--org-url <url>", "Dataverse org URL")
@@ -225,7 +225,7 @@ program
 
 program
   .command("init")
-  .description("Create a .agentlensrc.json config file in the current directory")
+  .description("Create a .caltrc.json config file in the current directory")
   .option("--force", "Overwrite existing config file")
   .action(withErrorHandler(async (options) => {
     await initCommand(options);
@@ -237,7 +237,7 @@ program
   .command("fix")
   .argument("[path]", "Path to agent manifest or project directory")
   .description("Auto-fix applicable issues in agent configuration")
-  .option("--config <path>", "Path to .agentlensrc.json")
+  .option("--config <path>", "Path to .caltrc.json")
   .option("--dry-run", "Show what would change without modifying files")
   .action(withErrorHandler(async (path, options) => {
     await fixCommand(path, options);

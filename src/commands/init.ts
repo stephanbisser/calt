@@ -16,7 +16,7 @@ const DEFAULT_CONFIG = {
 };
 
 export async function initCommand(options: { force?: boolean }): Promise<void> {
-  const filePath = resolve(process.cwd(), ".agentlensrc.json");
+  const filePath = resolve(process.cwd(), ".caltrc.json");
 
   let exists = false;
   try {
@@ -27,12 +27,12 @@ export async function initCommand(options: { force?: boolean }): Promise<void> {
   }
 
   if (exists && !options.force) {
-    console.log(chalk.yellow("⚠ .agentlensrc.json already exists. Use --force to overwrite."));
+    console.log(chalk.yellow("⚠ .caltrc.json already exists. Use --force to overwrite."));
     return;
   }
 
   await writeFile(filePath, JSON.stringify(DEFAULT_CONFIG, null, 2) + "\n");
-  console.log(chalk.green("✓ Created .agentlensrc.json"));
+  console.log(chalk.green("✓ Created .caltrc.json"));
   console.log(chalk.gray("  Customize rules, thresholds, and Graph API settings as needed."));
   console.log(chalk.gray("  Run 'calt setup' to register an Entra App and configure tenant access."));
 }

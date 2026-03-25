@@ -10,8 +10,8 @@ import { readFile, writeFile, mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { homedir } from "node:os";
 
-const AGENTLENS_DIR = join(homedir(), ".agentlens");
-const TOKEN_CACHE_FILE = join(AGENTLENS_DIR, "token-cache.json");
+const CALT_DIR = join(homedir(), ".calt");
+const TOKEN_CACHE_FILE = join(CALT_DIR, "token-cache.json");
 
 const SCOPES = [
   "https://graph.microsoft.com/CopilotPackages.Read.All",
@@ -45,7 +45,7 @@ function createMsalApp(config: AuthConfig): PublicClientApplication {
 }
 
 async function ensureDir(): Promise<void> {
-  await mkdir(AGENTLENS_DIR, { recursive: true });
+  await mkdir(CALT_DIR, { recursive: true });
 }
 
 async function loadCache(pca: PublicClientApplication): Promise<void> {

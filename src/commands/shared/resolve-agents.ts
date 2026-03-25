@@ -85,7 +85,7 @@ export async function resolveAgents(
         agents.push(...dvAgents);
       } else if (typeFilter === "copilot-studio") {
         throw new AgentLensError(
-          "Dataverse not configured. Use --org-url or set 'dataverse.org_url'/'dataverse.org_urls' in .agentlensrc.json.",
+          "Dataverse not configured. Use --org-url or set 'dataverse.org_url'/'dataverse.org_urls' in .caltrc.json.",
         );
       }
     }
@@ -102,7 +102,7 @@ export async function resolveAgents(
     if (useDataverse) {
       if (orgUrls.length === 0) {
         throw new AgentLensError(
-          "Dataverse not configured. Use --org-url or set 'dataverse.org_url'/'dataverse.org_urls' in .agentlensrc.json.",
+          "Dataverse not configured. Use --org-url or set 'dataverse.org_url'/'dataverse.org_urls' in .caltrc.json.",
         );
       }
       return [await loadFromDataverseAnyEnv(options.id, authConfig, orgUrls)];

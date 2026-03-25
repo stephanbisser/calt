@@ -7,14 +7,14 @@ import { tmpdir } from "node:os";
 
 describe("Config Loader", () => {
   it("should return defaults when no config file exists", async () => {
-    const config = await loadConfig("/nonexistent/.agentlensrc.json");
+    const config = await loadConfig("/nonexistent/.caltrc.json");
     expect(config).toEqual(DEFAULT_CONFIG);
   });
 
   it("should load and merge config from file", async () => {
     const dir = join(tmpdir(), "agentlens-config-test-" + Date.now());
     await mkdir(dir, { recursive: true });
-    const configPath = join(dir, ".agentlensrc.json");
+    const configPath = join(dir, ".caltrc.json");
     await writeFile(
       configPath,
       JSON.stringify({

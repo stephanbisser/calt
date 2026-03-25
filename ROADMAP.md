@@ -20,7 +20,7 @@ Ideas and enhancements for future development. Items marked **[planned]** have i
 
 - **File watcher mode (`calt watch`)** — Re-run scan/lint on every file save. Useful during instruction authoring. Implement with `fs.watch` or chokidar.
 - **`calt rules` command** — List all rules with IDs, descriptions, default severities, and categories. Like `eslint --print-config`.
-- **Shareable config presets** — Allow `"extends": "strict"` or `"extends": "recommended"` in `.agentlensrc.json` with curated rule sets (e.g., "security-first" preset).
+- **Shareable config presets** — Allow `"extends": "strict"` or `"extends": "recommended"` in `.caltrc.json` with curated rule sets (e.g., "security-first" preset).
 - **Schema version migration hints** — When manifest version < target, diff the schemas and suggest which fields to add for the upgrade.
 
 ### Analysis & Quality

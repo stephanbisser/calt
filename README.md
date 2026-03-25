@@ -109,7 +109,7 @@ calt scan --remote --all
 
 ### Login / Logout — M365 authentication
 
-Uses Device Code Flow via MSAL. Tokens are cached in `~/.agentlens/token-cache.json`.
+Uses Device Code Flow via MSAL. Tokens are cached in `~/.calt/token-cache.json`.
 
 ```bash
 # Interactive login
@@ -139,7 +139,7 @@ calt logout
 > 3. **API permissions** → Add → **Microsoft Graph** → **Delegated** → `CopilotPackages.Read.All`
 > 4. Login: `calt login --client-id <YOUR_APP_ID> --tenant <YOUR_TENANT_ID>`
 >
-> You can persist these in `.agentlensrc.json` under `graph_api.client_id` and `graph_api.tenant_id`.
+> You can persist these in `.caltrc.json` under `graph_api.client_id` and `graph_api.tenant_id`.
 
 ### Setup — register Entra App interactively
 
@@ -160,7 +160,7 @@ calt setup --login
 calt init
 ```
 
-Creates a `.agentlensrc.json` in the current directory:
+Creates a `.caltrc.json` in the current directory:
 
 ```json
 {
@@ -280,7 +280,7 @@ agentlens/
 │   ├── core/
 │   │   ├── types.ts                # All TypeScript interfaces
 │   │   ├── index.ts                # Public API (for VS Code extension reuse)
-│   │   ├── config-loader.ts        # .agentlensrc.json
+│   │   ├── config-loader.ts        # .caltrc.json
 │   │   ├── project-detector.ts     # Auto-detect project type
 │   │   └── manifest-loader.ts      # Load from file or Graph API
 │   ├── graph/
@@ -302,7 +302,7 @@ agentlens/
 │   ├── formatters/                 # terminal (chalk), json, markdown, html
 │   └── utils/                      # URL validator, Markdown parser
 ├── schemas/
-│   └── config.schema.json          # JSON Schema for .agentlensrc.json
+│   └── config.schema.json          # JSON Schema for .caltrc.json
 ├── tests/
 │   ├── fixtures/                   # Sample manifests + Graph API response
 │   ├── core/                       # project-detector, config-loader, markdown-parser, manifest-loader
@@ -337,7 +337,7 @@ npm run lint
 
 ## Token Security
 
-Authentication tokens are stored in `~/.agentlens/token-cache.json` with file permissions `0600` (owner-only read/write). Do not commit this directory to version control.
+Authentication tokens are stored in `~/.calt/token-cache.json` with file permissions `0600` (owner-only read/write). Do not commit this directory to version control.
 
 ## Contributing
 

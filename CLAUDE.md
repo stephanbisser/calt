@@ -33,13 +33,13 @@ The codebase follows a three-layer architecture:
 - `validate`: Schema-only validation
 - `fetch`: Download agent manifests from M365 tenant via Graph API
 - `login`/`logout`: MSAL Device Code Flow authentication
-- `init`: Create `.agentlensrc.json` config file
+- `init`: Create `.caltrc.json` config file
 - `setup`: Register an Entra App interactively
 - `report`: Export scan results (json/markdown/html)
 
 **2. Core Layer** (`src/core/`):
 - `types.ts`: All TypeScript interfaces (manifests, rules, configs, reports)
-- `config-loader.ts`: Reads and merges `.agentlensrc.json` with defaults
+- `config-loader.ts`: Reads and merges `.caltrc.json` with defaults
 - `project-detector.ts`: Auto-detects project type (Teams Toolkit, Agents Toolkit, standalone)
 - `manifest-loader.ts`: Loads manifests from local files or Microsoft Graph API
 - `index.ts`: Public API exports (for programmatic use)
@@ -54,7 +54,7 @@ The codebase follows a three-layer architecture:
 
 **Output Layer** (`src/formatters/`): terminal (Chalk), JSON, Markdown, HTML.
 
-**Graph Integration** (`src/graph/`): MSAL Device Code Flow auth with token cache at `~/.agentlens/token-cache.json`, Graph API client with pagination, response-to-manifest transformer.
+**Graph Integration** (`src/graph/`): MSAL Device Code Flow auth with token cache at `~/.calt/token-cache.json`, Graph API client with pagination, response-to-manifest transformer.
 
 ### Data Flow
 
@@ -68,7 +68,7 @@ CLI command → Config Loader → Project Detector → Manifest Loader (file or 
 
 ### Key Configuration
 
-`.agentlensrc.json` (per-project, committed to repo):
+`.caltrc.json` (per-project, committed to repo):
 - Override rule severities (`"off"` | `"warning"` | `"error"`)
 - Tune thresholds (`instruction_min_length`, `instruction_ideal_range`)
 - Store `graph_api.client_id` and `graph_api.tenant_id` for tenant scanning

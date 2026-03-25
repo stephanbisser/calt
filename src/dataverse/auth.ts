@@ -8,10 +8,10 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { homedir } from "node:os";
 
-const AGENTLENS_DIR = join(homedir(), ".agentlens");
+const CALT_DIR = join(homedir(), ".calt");
 // Shared token cache with Graph auth — MSAL's refresh token is multi-resource,
 // so a single Graph login can silently acquire Dataverse tokens too.
-const TOKEN_CACHE_FILE = join(AGENTLENS_DIR, "token-cache.json");
+const TOKEN_CACHE_FILE = join(CALT_DIR, "token-cache.json");
 
 // Default multi-tenant app ID – same as Graph auth; users can override
 const DEFAULT_CLIENT_ID = "14d82eec-204b-4c2f-b7e8-296a70dab67e";
@@ -39,7 +39,7 @@ function getScopes(orgUrl: string): string[] {
 }
 
 async function ensureDir(): Promise<void> {
-  await mkdir(AGENTLENS_DIR, { recursive: true });
+  await mkdir(CALT_DIR, { recursive: true });
 }
 
 async function loadCache(pca: PublicClientApplication): Promise<void> {

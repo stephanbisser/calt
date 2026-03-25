@@ -42,7 +42,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function ensureConfig(force?: boolean): Promise<string> {
-  const filePath = resolve(process.cwd(), ".agentlensrc.json");
+  const filePath = resolve(process.cwd(), ".caltrc.json");
   let exists = false;
   try {
     await access(filePath, constants.F_OK);
@@ -53,9 +53,9 @@ async function ensureConfig(force?: boolean): Promise<string> {
 
   if (!exists || force) {
     await writeFile(filePath, JSON.stringify(DEFAULT_CONFIG, null, 2) + "\n");
-    console.log(chalk.green(`✓ Created .agentlensrc.json`));
+    console.log(chalk.green(`✓ Created .caltrc.json`));
   } else {
-    console.log(chalk.gray("  .agentlensrc.json already exists — will update it."));
+    console.log(chalk.gray("  .caltrc.json already exists — will update it."));
   }
   return filePath;
 }
@@ -250,7 +250,7 @@ async function addDynamicsCrmPermission(appId: string): Promise<void> {
 // ─── Config persistence ─────────────────────────────────────────────────────
 
 async function saveToConfig(clientId: string, tenantId: string, orgUrls?: string[]): Promise<void> {
-  const filePath = resolve(process.cwd(), ".agentlensrc.json");
+  const filePath = resolve(process.cwd(), ".caltrc.json");
   const existing = await loadConfig(filePath);
   const dataverse: Record<string, unknown> = { ...existing.dataverse };
   if (orgUrls && orgUrls.length > 0) {
@@ -297,7 +297,7 @@ export async function setupCommand(options: {
 
   console.log(chalk.cyan("\nCALT – Setup\n"));
 
-  // Step 1: Ensure .agentlensrc.json exists
+  // Step 1: Ensure .caltrc.json exists
   await ensureConfig(options.force);
 
   // Step 2: Check Azure CLI — if missing, config is already created, show manual instructions
@@ -372,9 +372,9 @@ export async function setupCommand(options: {
       console.log(chalk.gray("  Users will consent individually during first login."));
     }
 
-    console.log(chalk.gray("\nSaving to .agentlensrc.json..."));
+    console.log(chalk.gray("\nSaving to .caltrc.json..."));
     await saveToConfig(appId, account.tenantId, selectedOrgUrls.length > 0 ? selectedOrgUrls : undefined);
-    console.log(chalk.green("✓ Saved to .agentlensrc.json"));
+    console.log(chalk.green("✓ Saved to .caltrc.json"));
 
     console.log("");
     console.log(chalk.cyan("Setup complete!"));

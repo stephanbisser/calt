@@ -12,14 +12,14 @@ describe("Config Loader – Dataverse section", () => {
   });
 
   it("should return defaults when no config file exists", async () => {
-    const config = await loadConfig("/nonexistent/.agentlensrc.json");
+    const config = await loadConfig("/nonexistent/.caltrc.json");
     expect(config.dataverse).toEqual({});
   });
 
   it("should load dataverse.org_url from config file", async () => {
     const dir = join(tmpdir(), "agentlens-dv-config-test-" + Date.now());
     await mkdir(dir, { recursive: true });
-    const configPath = join(dir, ".agentlensrc.json");
+    const configPath = join(dir, ".caltrc.json");
     await writeFile(
       configPath,
       JSON.stringify({
@@ -41,7 +41,7 @@ describe("Config Loader – Dataverse section", () => {
   it("should merge dataverse config with defaults", async () => {
     const dir = join(tmpdir(), "agentlens-dv-merge-test-" + Date.now());
     await mkdir(dir, { recursive: true });
-    const configPath = join(dir, ".agentlensrc.json");
+    const configPath = join(dir, ".caltrc.json");
     await writeFile(
       configPath,
       JSON.stringify({
@@ -62,7 +62,7 @@ describe("Config Loader – Dataverse section", () => {
   it("should load dataverse.org_urls from config file", async () => {
     const dir = join(tmpdir(), "agentlens-dv-orgurls-test-" + Date.now());
     await mkdir(dir, { recursive: true });
-    const configPath = join(dir, ".agentlensrc.json");
+    const configPath = join(dir, ".caltrc.json");
     await writeFile(
       configPath,
       JSON.stringify({
