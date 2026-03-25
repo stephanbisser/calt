@@ -29,7 +29,7 @@ export async function fixCommand(
       continue;
     }
 
-    console.log(chalk.bold.cyan(`\nAgentLens Auto-Fix: "${agent.manifest.name}"`));
+    console.log(chalk.bold.cyan(`\nCALT Auto-Fix: "${agent.manifest.name}"`));
     console.log(chalk.cyan("================================\n"));
 
     // Run scan to get results with fix descriptors

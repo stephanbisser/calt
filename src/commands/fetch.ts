@@ -44,10 +44,10 @@ export async function fetchCommand(options: {
   } else {
     console.log(chalk.yellow("\nSpecify --list, --id <id>, or --all.\n"));
     console.log(chalk.gray("Examples:"));
-    console.log(chalk.gray("  agentlens fetch --list"));
-    console.log(chalk.gray("  agentlens fetch --list --type copilot-studio"));
-    console.log(chalk.gray("  agentlens fetch --id T_cebfd158-7116-1e34-27f5-0efca5f046f0"));
-    console.log(chalk.gray("  agentlens fetch --all --output ./agents/"));
+    console.log(chalk.gray("  calt fetch --list"));
+    console.log(chalk.gray("  calt fetch --list --type copilot-studio"));
+    console.log(chalk.gray("  calt fetch --id T_cebfd158-7116-1e34-27f5-0efca5f046f0"));
+    console.log(chalk.gray("  calt fetch --all --output ./agents/"));
     throw new AgentLensError("No fetch action specified. Use --list, --id <id>, or --all.");
   }
 }

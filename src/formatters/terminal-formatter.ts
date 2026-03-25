@@ -57,8 +57,8 @@ export function formatScanReport(report: ScanReport, verbose = false): string {
   const lines: string[] = [];
 
   lines.push("");
-  lines.push(chalk.bold.cyan("AgentLens Scan Report"));
-  lines.push(chalk.cyan("====================="));
+  lines.push(chalk.bold.cyan("CALT Scan Report"));
+  lines.push(chalk.cyan("================="));
   lines.push("");
 
   // Agent info
@@ -207,8 +207,8 @@ export function formatLintReport(report: ScanReport): string {
   const lines: string[] = [];
 
   lines.push("");
-  lines.push(chalk.bold.cyan("AgentLens Instruction Lint"));
-  lines.push(chalk.cyan("=========================="));
+  lines.push(chalk.bold.cyan("CALT Instruction Lint"));
+  lines.push(chalk.cyan("======================"));
   lines.push("");
 
   lines.push(`${chalk.gray("Agent:")}        ${chalk.bold('"' + report.agent.name + '"')}`);
@@ -315,8 +315,8 @@ export function formatAgentTable(agents: CopilotPackage[] | RemoteAgentSummary[]
   const lines: string[] = [];
 
   lines.push("");
-  lines.push(chalk.bold.cyan("AgentLens – Agents in Tenant"));
-  lines.push(chalk.cyan("============================="));
+  lines.push(chalk.bold.cyan("CALT – Agents in Tenant"));
+  lines.push(chalk.cyan("========================"));
   lines.push("");
 
   // Show environment column when any agent has one

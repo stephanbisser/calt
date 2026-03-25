@@ -96,7 +96,7 @@ export async function login(
         // the devicecode endpoint hit a propagated node but the token endpoint did not.
         throw new Error(
           `Login failed with invalid_client. The app registration may not have fully propagated in Azure AD yet.\n` +
-          `Wait 1–2 minutes and run 'agentlens login' again.`,
+          `Wait 1–2 minutes and run 'calt login' again.`,
         );
       } else {
         throw new Error(
@@ -105,7 +105,7 @@ export async function login(
           `  1. Azure Portal → Entra ID → App registrations → New registration\n` +
           `  2. Authentication → Add platform → Mobile/desktop → enable device code flow\n` +
           `  3. API permissions → Add → Microsoft Graph → Delegated → CopilotPackages.Read.All\n` +
-          `  4. agentlens login --client-id <YOUR_APP_ID> --tenant <YOUR_TENANT_ID>`,
+          `  4. calt login --client-id <YOUR_APP_ID> --tenant <YOUR_TENANT_ID>`,
         );
       }
     }
@@ -116,7 +116,7 @@ export async function login(
         `  1. Azure Portal → Entra ID → App registrations → New registration\n` +
         `  2. Authentication → Add platform → Mobile/desktop → enable device code flow\n` +
         `  3. API permissions → Add → Microsoft Graph → Delegated → CopilotPackages.Read.All\n` +
-        `  4. agentlens login --client-id <YOUR_APP_ID> --tenant <YOUR_TENANT_ID>`,
+        `  4. calt login --client-id <YOUR_APP_ID> --tenant <YOUR_TENANT_ID>`,
       );
     }
     throw err;
@@ -136,7 +136,7 @@ export async function acquireToken(config: AuthConfig): Promise<string> {
   const accounts = await pca.getTokenCache().getAllAccounts();
   if (accounts.length === 0) {
     throw new Error(
-      "Not logged in. Run 'agentlens login' first.",
+      "Not logged in. Run 'calt login' first.",
     );
   }
 
@@ -151,7 +151,7 @@ export async function acquireToken(config: AuthConfig): Promise<string> {
     return result.accessToken;
   } catch {
     throw new Error(
-      "Token expired and could not be refreshed. Run 'agentlens login' again.",
+      "Token expired and could not be refreshed. Run 'calt login' again.",
     );
   }
 }

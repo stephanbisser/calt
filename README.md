@@ -1,8 +1,8 @@
-# AgentLens
+# CALT — Copilot Agent Lint Tool
 
 Lint, validate, and analyze **Microsoft 365 Copilot Agent** configurations — locally or directly from your tenant.
 
-AgentLens helps Makers and Pro Developers check the quality of their Declarative Agent, Copilot Studio Agent, and Custom Engine Agent configurations **before** they deploy.
+CALT helps Makers and Pro Developers check the quality of their Declarative Agent, Copilot Studio Agent, and Custom Engine Agent configurations **before** they deploy.
 
 > **Note:** Scanning Agent Builder agents from your tenant uses a **beta Microsoft Graph API endpoint** (`/beta/copilot/admin/catalog/packages`). This endpoint may not yet be available in all tenants or regions. Local file scanning works independently of the Graph API.
 
@@ -10,16 +10,16 @@ AgentLens helps Makers and Pro Developers check the quality of their Declarative
 
 ```bash
 # Install globally
-npm install -g agentlens
+npm install -g calt
 
 # Scan a local agent manifest
-agentlens scan ./path/to/declarativeAgent.json
+calt scan ./path/to/declarativeAgent.json
 
 # Scan a project folder (auto-detects appPackage/ etc.)
-agentlens scan ./my-agent-project
+calt scan ./my-agent-project
 
 # Scan with auto-fix
-agentlens scan --fix ./declarativeAgent.json
+calt scan --fix ./declarativeAgent.json
 ```
 
 ## CLI Commands
@@ -28,58 +28,58 @@ agentlens scan --fix ./declarativeAgent.json
 
 ```bash
 # Scan a local manifest file
-agentlens scan ./path/to/declarativeAgent.json
+calt scan ./path/to/declarativeAgent.json
 
 # Scan a project folder (auto-detects appPackage/ etc.)
-agentlens scan ./my-agent-project
+calt scan ./my-agent-project
 
 # Scan the current directory
-agentlens scan
+calt scan
 
 # Output as JSON (for CI/CD)
-agentlens scan ./declarativeAgent.json --format json
+calt scan ./declarativeAgent.json --format json
 
 # Verbose output (shows all passed checks)
-agentlens scan ./declarativeAgent.json --verbose
+calt scan ./declarativeAgent.json --verbose
 
 # Auto-fix applicable issues
-agentlens scan --fix ./declarativeAgent.json
+calt scan --fix ./declarativeAgent.json
 ```
 
 ### Lint — instruction quality only
 
 ```bash
 # Lint a local manifest
-agentlens lint ./declarativeAgent.json
+calt lint ./declarativeAgent.json
 
 # JSON output
-agentlens lint ./declarativeAgent.json --format json
+calt lint ./declarativeAgent.json --format json
 ```
 
 ### Validate — schema only
 
 ```bash
-agentlens validate ./declarativeAgent.json
+calt validate ./declarativeAgent.json
 ```
 
 ### Fix — auto-fix issues
 
 ```bash
 # Auto-fix applicable issues
-agentlens fix ./declarativeAgent.json
+calt fix ./declarativeAgent.json
 
 # Preview fixes without modifying files
-agentlens fix --dry-run ./declarativeAgent.json
+calt fix --dry-run ./declarativeAgent.json
 ```
 
 ### Diff — compare two agents
 
 ```bash
 # Compare two local manifests
-agentlens diff ./agentA.json ./agentB.json
+calt diff ./agentA.json ./agentB.json
 
 # Compare local vs remote
-agentlens diff ./local.json T_cebfd158-7116-1e34-27f5-0efca5f046f0
+calt diff ./local.json T_cebfd158-7116-1e34-27f5-0efca5f046f0
 ```
 
 ### Fetch — load agents from your M365 Tenant
@@ -88,23 +88,23 @@ Requires authentication first (see below).
 
 ```bash
 # List all Copilot agents in the tenant
-agentlens fetch --list
+calt fetch --list
 
 # Download a specific agent as a local JSON file
-agentlens fetch --id T_cebfd158-7116-1e34-27f5-0efca5f046f0
+calt fetch --id T_cebfd158-7116-1e34-27f5-0efca5f046f0
 
 # Download all agents into a folder
-agentlens fetch --all --output ./agents/
+calt fetch --all --output ./agents/
 
 # Filter by agent type
-agentlens fetch --list --type copilot-studio
+calt fetch --list --type copilot-studio
 ```
 
 ### Scan remote agents directly (fetch + scan in one step)
 
 ```bash
-agentlens scan --remote --id T_cebfd158-7116-1e34-27f5-0efca5f046f0
-agentlens scan --remote --all
+calt scan --remote --id T_cebfd158-7116-1e34-27f5-0efca5f046f0
+calt scan --remote --all
 ```
 
 ### Login / Logout — M365 authentication
@@ -113,22 +113,22 @@ Uses Device Code Flow via MSAL. Tokens are cached in `~/.agentlens/token-cache.j
 
 ```bash
 # Interactive login
-agentlens login
+calt login
 
 # Login with a specific tenant
-agentlens login --tenant YOUR_TENANT_ID
+calt login --tenant YOUR_TENANT_ID
 
 # Use a custom Entra App Registration
-agentlens login --client-id YOUR_CLIENT_ID
+calt login --client-id YOUR_CLIENT_ID
 
 # Check login status
-agentlens login --status
+calt login --status
 
 # Check login status with token details
-agentlens login --status --verbose
+calt login --status --verbose
 
 # Clear cached tokens
-agentlens logout
+calt logout
 ```
 
 > **Required permission:** `CopilotPackages.Read.All` (Delegated, Work or School Account — no admin consent required)
@@ -137,7 +137,7 @@ agentlens logout
 > 1. Azure Portal → **Entra ID** → **App registrations** → **New registration**
 > 2. **Authentication** → Add platform → **Mobile and desktop applications** → enable device code flow (`https://login.microsoftonline.com/common/oauth2/nativeclient`)
 > 3. **API permissions** → Add → **Microsoft Graph** → **Delegated** → `CopilotPackages.Read.All`
-> 4. Login: `agentlens login --client-id <YOUR_APP_ID> --tenant <YOUR_TENANT_ID>`
+> 4. Login: `calt login --client-id <YOUR_APP_ID> --tenant <YOUR_TENANT_ID>`
 >
 > You can persist these in `.agentlensrc.json` under `graph_api.client_id` and `graph_api.tenant_id`.
 
@@ -145,19 +145,19 @@ agentlens logout
 
 ```bash
 # Interactive setup (creates config + registers Entra App via Azure CLI)
-agentlens setup
+calt setup
 
 # With a custom app name
-agentlens setup --app-name "My AgentLens"
+calt setup --app-name "My CALT"
 
 # Login immediately after setup
-agentlens setup --login
+calt setup --login
 ```
 
 ### Init — create a config file
 
 ```bash
-agentlens init
+calt init
 ```
 
 Creates a `.agentlensrc.json` in the current directory:
@@ -190,16 +190,16 @@ Override any rule severity or turn rules off:
 
 ```bash
 # JSON report
-agentlens report ./declarativeAgent.json --format json
+calt report ./declarativeAgent.json --format json
 
 # Markdown report
-agentlens report ./declarativeAgent.json --format markdown
+calt report ./declarativeAgent.json --format markdown
 
 # HTML report saved to file
-agentlens report ./declarativeAgent.json --format html --output report.html
+calt report ./declarativeAgent.json --format html --output report.html
 
 # Report all remote agents
-agentlens report --remote --all --format markdown
+calt report --remote --all --format markdown
 ```
 
 ## Lint Rules Reference
@@ -262,12 +262,12 @@ agentlens report --remote --all --format markdown
 
 ## CI/CD Integration
 
-AgentLens exits with code `1` when errors are found, making it usable as a CI gate:
+CALT exits with code `1` when errors are found, making it usable as a CI gate:
 
 ```yaml
 # GitHub Actions example
 - name: Lint Copilot Agents
-  run: npx agentlens scan ./agents/ --format json
+  run: npx calt scan ./agents/ --format json
 ```
 
 ## Project Structure
@@ -318,7 +318,7 @@ agentlens/
 
 ```bash
 # Clone and install
-git clone https://github.com/stephanbisser/agentlens.git
+git clone https://github.com/stephanbisser/calt.git
 cd agentlens
 npm install
 

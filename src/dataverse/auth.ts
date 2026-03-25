@@ -92,7 +92,7 @@ export async function acquireDataverseToken(config: DataverseAuthConfig): Promis
   const accounts = await pca.getTokenCache().getAllAccounts();
   if (accounts.length === 0) {
     throw new Error(
-      "Not logged in. Run 'agentlens login' first.",
+      "Not logged in. Run 'calt login' first.",
     );
   }
 
@@ -108,7 +108,7 @@ export async function acquireDataverseToken(config: DataverseAuthConfig): Promis
     return result.accessToken;
   } catch {
     throw new Error(
-      "Dataverse token expired and could not be refreshed. Run 'agentlens login' again.",
+      "Dataverse token expired and could not be refreshed. Run 'calt login' again.",
     );
   }
 }

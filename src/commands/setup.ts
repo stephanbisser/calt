@@ -27,7 +27,7 @@ const DYNAMICS_USER_IMPERSONATION_GUID = "78ce3f0f-a1ce-49c2-8cde-64b5c0896db4";
 
 const DEFAULT_CONFIG = {
   $schema:
-    "https://raw.githubusercontent.com/stephanbisser/agentlens/main/schemas/config.schema.json",
+    "https://raw.githubusercontent.com/stephanbisser/calt/main/schemas/config.schema.json",
   rules: {},
   instruction_min_length: 200,
   instruction_ideal_range: [500, 4000],
@@ -116,14 +116,14 @@ async function getAzAccount(): Promise<{ tenantId: string; name: string }> {
     raw = await runAz(["account", "list", "-o", "json"]);
   } catch {
     throw new Error(
-      "Azure CLI is not logged in. Run 'az login' first, then retry 'agentlens setup'.",
+      "Azure CLI is not logged in. Run 'az login' first, then retry 'calt setup'.",
     );
   }
 
   const accounts = JSON.parse(raw) as AzAccount[];
   if (accounts.length === 0) {
     throw new Error(
-      "Azure CLI is not logged in. Run 'az login' first, then retry 'agentlens setup'.",
+      "Azure CLI is not logged in. Run 'az login' first, then retry 'calt setup'.",
     );
   }
 
@@ -276,13 +276,13 @@ function printManualInstructions(): void {
   console.log("");
   console.log(chalk.cyan("  Manual setup steps:"));
   console.log(chalk.gray("  1. Azure Portal → Entra ID → App registrations → New registration"));
-  console.log(chalk.gray("     Name: AgentLens | Supported account types: This org only"));
+  console.log(chalk.gray("     Name: CALT | Supported account types: This org only"));
   console.log(chalk.gray("  2. Authentication → Add a platform → Mobile and desktop applications"));
   console.log(chalk.gray(`     Enable: ${DEVICE_CODE_REDIRECT}`));
   console.log(chalk.gray("  3. API permissions → Add a permission → Microsoft Graph → Delegated"));
   console.log(chalk.gray("     Search for and add: CopilotPackages.Read.All"));
   console.log(chalk.gray("  4. Copy the Application (client) ID and your tenant ID, then run:"));
-  console.log(chalk.gray("     agentlens login --client-id <APP_ID> --tenant <TENANT_ID>"));
+  console.log(chalk.gray("     calt login --client-id <APP_ID> --tenant <TENANT_ID>"));
   console.log("");
 }
 
@@ -293,9 +293,9 @@ export async function setupCommand(options: {
   login?: boolean;
   force?: boolean;
 }): Promise<void> {
-  const appName = options.appName ?? "AgentLens";
+  const appName = options.appName ?? "CALT";
 
-  console.log(chalk.cyan("\nAgentLens – Setup\n"));
+  console.log(chalk.cyan("\nCALT – Setup\n"));
 
   // Step 1: Ensure .agentlensrc.json exists
   await ensureConfig(options.force);
@@ -402,7 +402,7 @@ export async function setupCommand(options: {
 
       // Single device code flow — Dataverse token acquired silently via shared refresh token
       const authConfig: AuthConfig = { clientId: appId, tenantId: account.tenantId };
-      console.log(chalk.cyan("AgentLens – Login\n"));
+      console.log(chalk.cyan("CALT – Login\n"));
       try {
         const result = await login(authConfig, (message) => {
           console.log(chalk.yellow(message));
@@ -436,7 +436,7 @@ export async function setupCommand(options: {
             } catch {
               console.log(chalk.yellow(`⚠ Dataverse token could not be acquired for ${verifyOrgUrl}`));
               console.log(chalk.gray("  The Dynamics CRM permission may need a few minutes to propagate."));
-              console.log(chalk.gray("  Run 'agentlens login' to retry."));
+              console.log(chalk.gray("  Run 'calt login' to retry."));
             }
           }
         }
@@ -445,12 +445,12 @@ export async function setupCommand(options: {
         const msg = loginErr instanceof Error ? loginErr.message : String(loginErr);
         console.log(chalk.yellow("\n⚠ Setup complete, but login needs a retry."));
         console.log(chalk.gray(`  ${msg.split("\n")[0]}`));
-        console.log(chalk.gray("  Run 'agentlens login' in 1–2 minutes."));
+        console.log(chalk.gray("  Run 'calt login' in 1–2 minutes."));
         console.log("");
         // Do not re-throw — the app is registered and config is saved.
       }
     } else {
-      console.log(chalk.gray("  Run 'agentlens login' to authenticate."));
+      console.log(chalk.gray("  Run 'calt login' to authenticate."));
       console.log("");
     }
   } catch (err) {

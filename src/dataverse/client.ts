@@ -31,7 +31,7 @@ export class DataverseClient {
       const body = await response.text().catch(() => "");
       if (response.status === 401) {
         throw new DataverseApiError(
-          "Unauthorized. Your Dataverse token may have expired. Run 'agentlens login --dataverse' again.",
+          "Unauthorized. Your Dataverse token may have expired. Run 'calt login --dataverse' again.",
           response.status,
         );
       }

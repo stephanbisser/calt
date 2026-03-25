@@ -20,7 +20,7 @@ export class GraphClient {
       const body = await response.text().catch(() => "");
       if (response.status === 401) {
         throw new GraphApiError(
-          "Unauthorized. Your token may have expired. Run 'agentlens login' again.",
+          "Unauthorized. Your token may have expired. Run 'calt login' again.",
           response.status,
         );
       }

@@ -39,9 +39,9 @@ const program = new Command();
 const AGENT_TYPE_CHOICES = ["agent-builder", "copilot-studio", "sharepoint", "all"];
 
 program
-  .name("agentlens")
+  .name("calt")
   .description(
-    "Lint, validate, and analyze Microsoft 365 Copilot Agent configurations",
+    "CALT – Lint, validate, and analyze Microsoft 365 Copilot Agent configurations",
   )
   .version(pkg.version);
 
@@ -174,8 +174,8 @@ program
 program
   .command("setup")
   .description("Create .agentlensrc.json, register an Entra ID app, and discover Power Platform environments")
-  .option("--app-name <name>", "Display name for the app registration", "AgentLens")
-  .option("--login", "Run 'agentlens login' immediately after setup")
+  .option("--app-name <name>", "Display name for the app registration", "CALT")
+  .option("--login", "Run 'calt login' immediately after setup")
   .option("--force", "Overwrite existing .agentlensrc.json config file")
   .action(withErrorHandler(async (options) => {
     await setupCommand(options);

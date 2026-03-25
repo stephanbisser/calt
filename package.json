@@ -1,10 +1,10 @@
 {
-  "name": "agentlens",
+  "name": "calt",
   "version": "0.1.0",
-  "description": "Lint, validate, and analyze Microsoft 365 Copilot Agent configurations – locally or directly from your tenant",
+  "description": "CALT — Copilot Agent Lint Tool: Lint, validate, and analyze Microsoft 365 Copilot Agent configurations – locally or directly from your tenant",
   "type": "module",
   "bin": {
-    "agentlens": "./dist/index.js"
+    "calt": "./dist/index.js"
   },
   "main": "./dist/core/index.js",
   "types": "./dist/core/index.d.ts",
@@ -36,11 +36,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/stephanbisser/agentlens.git"
+    "url": "https://github.com/stephanbisser/calt.git"
   },
-  "homepage": "https://github.com/stephanbisser/agentlens#readme",
+  "homepage": "https://github.com/stephanbisser/calt#readme",
   "bugs": {
-    "url": "https://github.com/stephanbisser/agentlens/issues"
+    "url": "https://github.com/stephanbisser/calt/issues"
   },
   "engines": {
     "node": ">=18.0.0"

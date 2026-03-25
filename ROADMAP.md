@@ -1,4 +1,4 @@
-# AgentLens Roadmap
+# CALT Roadmap
 
 Ideas and enhancements for future development. Items marked **[planned]** have implementation plans; others are tracked here for later prioritization.
 
@@ -6,9 +6,9 @@ Ideas and enhancements for future development. Items marked **[planned]** have i
 
 ## Planned (implementation in progress)
 
-- **Auto-fix mode (`agentlens fix` / `--fix`)** — Automatically scaffold missing sections, remove secrets, deduplicate starters, add guardrail boilerplate.
+- **Auto-fix mode (`calt fix` / `--fix`)** — Automatically scaffold missing sections, remove secrets, deduplicate starters, add guardrail boilerplate.
 - **Plugin/action manifest validation** — Open and validate OpenAPI specs inside action plugin files, check operationIds, auth config, cross-reference with instructions.
-- **Agent diff (`agentlens diff`)** — Structured comparison of two manifests (local vs remote, two revisions). Terminal, markdown, or JSON output.
+- **Agent diff (`calt diff`)** — Structured comparison of two manifests (local vs remote, two revisions). Terminal, markdown, or JSON output.
 - **Capability–instruction alignment scoring** — Deep check that each configured capability is referenced and guided in the instructions. Score as percentage.
 - **Instruction complexity / readability metrics** — Flesch-Kincaid readability, section density, nested conditional detection, token count estimation.
 
@@ -18,8 +18,8 @@ Ideas and enhancements for future development. Items marked **[planned]** have i
 
 ### Developer Experience
 
-- **File watcher mode (`agentlens watch`)** — Re-run scan/lint on every file save. Useful during instruction authoring. Implement with `fs.watch` or chokidar.
-- **`agentlens rules` command** — List all rules with IDs, descriptions, default severities, and categories. Like `eslint --print-config`.
+- **File watcher mode (`calt watch`)** — Re-run scan/lint on every file save. Useful during instruction authoring. Implement with `fs.watch` or chokidar.
+- **`calt rules` command** — List all rules with IDs, descriptions, default severities, and categories. Like `eslint --print-config`.
 - **Shareable config presets** — Allow `"extends": "strict"` or `"extends": "recommended"` in `.agentlensrc.json` with curated rule sets (e.g., "security-first" preset).
 - **Schema version migration hints** — When manifest version < target, diff the schemas and suggest which fields to add for the upgrade.
 
@@ -35,7 +35,7 @@ Ideas and enhancements for future development. Items marked **[planned]** have i
 
 ### Remote Operations
 
-- **`agentlens push`** — Deploy local manifest back to Graph API or Dataverse. Closes the fetch → edit → lint → push loop. Requires write scopes.
+- **`calt push`** — Deploy local manifest back to Graph API or Dataverse. Closes the fetch → edit → lint → push loop. Requires write scopes.
 
 ### Copilot Studio Deep Dive
 

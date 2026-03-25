@@ -1,11 +1,11 @@
-# Contributing to AgentLens
+# Contributing to CALT
 
-Thanks for your interest in contributing to AgentLens! Here's how to get started.
+Thanks for your interest in contributing to CALT! Here's how to get started.
 
 ## Development Setup
 
 ```bash
-git clone https://github.com/stephanbisser/agentlens.git
+git clone https://github.com/stephanbisser/calt.git
 cd agentlens
 npm install
 npm run build
@@ -20,7 +20,7 @@ npm run dev -- scan <path>
 
 # Or link globally
 npm link
-agentlens scan <path>
+calt scan <path>
 ```
 
 ## Project Structure
@@ -57,4 +57,4 @@ agentlens scan <path>
 
 ## Reporting Issues
 
-Use [GitHub Issues](https://github.com/stephanbisser/agentlens/issues) to report bugs or request features.
+Use [GitHub Issues](https://github.com/stephanbisser/calt/issues) to report bugs or request features.

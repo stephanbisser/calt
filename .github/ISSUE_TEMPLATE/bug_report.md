@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug in AgentLens
+about: Report a bug in CALT
 title: ''
 labels: bug
 assignees: ''
@@ -10,7 +10,7 @@ assignees: ''
 A clear description of the bug.
 
 ## Steps to Reproduce
-1. Run `agentlens ...`
+1. Run `calt ...`
 2. ...
 
 ## Expected Behavior
@@ -20,6 +20,6 @@ What you expected to happen.
 What actually happened. Include the full error output if applicable.
 
 ## Environment
-- AgentLens version: (`agentlens --version`)
+- CALT version: (`calt --version`)
 - Node.js version: (`node --version`)
 - OS:

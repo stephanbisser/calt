@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**AgentLens** is a TypeScript/Node.js CLI tool for linting, validating, and analyzing Microsoft 365 Copilot Agent configurations (Declarative Agents, Copilot Studio Agents, Custom Engine Agents) before deployment. It also exposes a public API for use as a library (e.g., by a VS Code extension).
+**CALT** (Copilot Agent Lint Tool) is a TypeScript/Node.js CLI tool for linting, validating, and analyzing Microsoft 365 Copilot Agent configurations (Declarative Agents, Copilot Studio Agents, Custom Engine Agents) before deployment. It also exposes a public API for use as a library (e.g., by a VS Code extension).
 
 ## Commands
 
@@ -75,7 +75,7 @@ CLI command → Config Loader → Project Detector → Manifest Loader (file or 
 
 ### Public API
 
-`src/core/index.ts` re-exports functions for programmatic use. The package exports both a CLI binary (`agentlens` → `dist/index.js`) and a library entry point (`dist/core/index.js`).
+`src/core/index.ts` re-exports functions for programmatic use. The package exports both a CLI binary (`calt` → `dist/index.js`) and a library entry point (`dist/core/index.js`).
 
 ## Key Technical Details
 

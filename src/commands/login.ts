@@ -16,7 +16,7 @@ export async function loginCommand(options: {
   };
 
   // Single device code login — MSAL's refresh token covers both Graph + Dataverse
-  console.log(chalk.cyan("\nAgentLens – Login\n"));
+  console.log(chalk.cyan("\nCALT – Login\n"));
 
   const result = await login(authConfig, (message) => {
     console.log(chalk.yellow(message));
@@ -59,10 +59,10 @@ export async function loginCommand(options: {
         console.log(chalk.yellow(`⚠ Dataverse token could not be acquired for ${orgUrl}`));
         if (msg.includes("AADSTS650057") || msg.includes("Invalid resource")) {
           console.log(chalk.gray("  The Dynamics CRM API permission is not registered on your app."));
-          console.log(chalk.gray("  Run 'agentlens setup --force' to reconfigure."));
+          console.log(chalk.gray("  Run 'calt setup --force' to reconfigure."));
         } else {
           console.log(chalk.gray("  Ensure 'Dynamics CRM → user_impersonation' is added to your app registration."));
-          console.log(chalk.gray("  Run 'agentlens setup --force' to reconfigure."));
+          console.log(chalk.gray("  Run 'calt setup --force' to reconfigure."));
         }
       }
     }
@@ -89,7 +89,7 @@ export async function statusCommand(options: {
     tenantId: options.tenant ?? cfg.graph_api.tenant_id,
   };
 
-  console.log(chalk.cyan("\nAgentLens – Login Status\n"));
+  console.log(chalk.cyan("\nCALT – Login Status\n"));
 
   // Graph status
   const status = await getLoginStatus(config);
@@ -124,7 +124,7 @@ export async function statusCommand(options: {
     }
   } else {
     console.log(chalk.yellow("✗ Graph API: Not logged in"));
-    console.log(chalk.gray("  Run 'agentlens login' to authenticate."));
+    console.log(chalk.gray("  Run 'calt login' to authenticate."));
   }
 
   // Dataverse status
@@ -146,7 +146,7 @@ export async function statusCommand(options: {
       }
     } else {
       console.log(chalk.yellow("✗ Dataverse: Not logged in"));
-      console.log(chalk.gray("  Ensure Dynamics CRM permission is added to your app, then run 'agentlens login'."));
+      console.log(chalk.gray("  Ensure Dynamics CRM permission is added to your app, then run 'calt login'."));
     }
   }
 

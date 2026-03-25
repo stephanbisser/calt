@@ -5,8 +5,8 @@ export function formatDiff(report: DiffReport): string {
   const lines: string[] = [];
 
   lines.push("");
-  lines.push(chalk.bold.cyan("AgentLens Diff Report"));
-  lines.push(chalk.cyan("====================="));
+  lines.push(chalk.bold.cyan("CALT Diff Report"));
+  lines.push(chalk.cyan("================="));
   lines.push("");
   lines.push(`${chalk.gray("Agent A:")} ${chalk.bold(report.agentA.name)} ${chalk.gray(formatSource(report.agentA.source))}`);
   lines.push(`${chalk.gray("Agent B:")} ${chalk.bold(report.agentB.name)} ${chalk.gray(formatSource(report.agentB.source))}`);

@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest an idea for AgentLens
+about: Suggest an idea for CALT
 title: ''
 labels: enhancement
 assignees: ''
