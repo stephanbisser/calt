@@ -10,7 +10,7 @@ CALT helps Makers and Pro Developers check the quality of their Declarative Agen
 
 ```bash
 # Install globally
-npm install -g calt
+npm install -g calt-cli
 
 # Scan a local agent manifest
 calt scan ./path/to/declarativeAgent.json
@@ -267,7 +267,7 @@ CALT exits with code `1` when errors are found, making it usable as a CI gate:
 ```yaml
 # GitHub Actions example
 - name: Lint Copilot Agents
-  run: npx calt scan ./agents/ --format json
+  run: npx calt-cli scan ./agents/ --format json
 ```
 
 ## Project Structure
