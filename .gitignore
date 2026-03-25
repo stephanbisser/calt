@@ -3,6 +3,7 @@ dist/
 *.js.map
 *.d.ts.map
 .caltrc.json
+.agentlensrc.json
 *.tsbuildinfo
 coverage/
 .DS_Store
