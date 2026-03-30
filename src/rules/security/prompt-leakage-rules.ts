@@ -13,8 +13,11 @@ const ARCHITECTURE_PATTERNS = [
   // German
   /unser (?:Backend|Server|Datenbank|System) (?:läuft|verwendet|basiert)/i,
   /gehostet (?:auf|in|bei) (?:Azure|AWS|GCP|Kubernetes)/i,
-  /die datenbank verwendet (?:PostgreSQL|MySQL|MongoDB)/i,
+  /bereitgestellt auf (?:Azure|AWS|GCP|Kubernetes|Docker)/i,
+  /die datenbank verwendet (?:PostgreSQL|MySQL|MongoDB|SQL Server|CosmosDB)/i,
   /interner (?:Endpunkt|API|Dienst) unter/i,
+  /(?:läuft|erstellt) (?:auf|mit) (?:Node\.js|\.NET|Java|Python|Go|Rust)/i,
+  /unsere (?:API|Microservices?|Architektur) (?:ist|verwendet|läuft)/i,
 ];
 
 // Prompt leakage guardrail patterns (EN + DE)
@@ -27,6 +30,7 @@ const LEAKAGE_GUARDRAIL_PATTERNS = [
   // German
   /(?:gib|teile) (?:deine|diese) anweisungen nicht (?:preis|weiter)/i,
   /halte (?:deine|diese) anweisungen (?:vertraulich|geheim)/i,
+  /(?:gib|wiederhole|zeige) niemals (?:deine|die|diese|system)(?:\s?-?\s?)(?:anweisungen|prompt|systemprompt)/i,
   /anweisungen sind vertraulich/i,
 ];
 

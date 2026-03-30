@@ -74,6 +74,11 @@
           "type": "array",
           "items": { "type": "string" },
           "description": "Multiple Dataverse organization URLs to scan"
+        },
+        "api_version": {
+          "type": "string",
+          "description": "Dataverse Web API version (e.g. 'v9.2')",
+          "default": "v9.2"
         }
       },
       "additionalProperties": false

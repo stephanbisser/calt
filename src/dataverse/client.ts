@@ -4,7 +4,7 @@ import type {
   DataverseListResponse,
 } from "../core/types.js";
 
-const API_PATH = "/api/data/v9.2";
+const DEFAULT_API_VERSION = "v9.2";
 
 export class DataverseClient {
   private baseUrl: string;
@@ -12,9 +12,11 @@ export class DataverseClient {
   constructor(
     private accessToken: string,
     orgUrl: string,
+    apiVersion?: string,
   ) {
+    const version = apiVersion ?? DEFAULT_API_VERSION;
     // Ensure no trailing slash
-    this.baseUrl = orgUrl.replace(/\/+$/, "") + API_PATH;
+    this.baseUrl = orgUrl.replace(/\/+$/, "") + `/api/data/${version}`;
   }
 
   private async dvFetch<T>(url: string): Promise<T> {

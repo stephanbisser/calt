@@ -10,6 +10,9 @@ import {
 import type { AuthConfig } from "../../graph/auth.js";
 import type { AgentType, AgentLensConfig, LoadedAgent } from "../../core/types.js";
 
+// T_ = Teams app package ID, P_ = Published agent ID (Graph API identifiers)
+const GRAPH_AGENT_PREFIXES = ["T_", "P_"];
+
 export type TypeFilter = AgentType | "all";
 
 export interface RemoteOptions {
@@ -94,7 +97,7 @@ export async function resolveAgents(
   }
 
   if (options.id) {
-    const isGraphId = options.id.startsWith("T_") || options.id.startsWith("P_");
+    const isGraphId = GRAPH_AGENT_PREFIXES.some((p) => options.id!.startsWith(p));
     const useDataverse =
       typeFilter === "copilot-studio" ||
       (!isGraphId && typeFilter !== "agent-builder" && typeFilter !== "sharepoint");
@@ -123,7 +126,7 @@ export async function resolveSource(
   orgUrls: string[],
 ): Promise<LoadedAgent> {
   // T_ or P_ prefix → Graph API
-  if (source.startsWith("T_") || source.startsWith("P_")) {
+  if (GRAPH_AGENT_PREFIXES.some((p) => source.startsWith(p))) {
     return loadFromRemote(source, authConfig);
   }
 

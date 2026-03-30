@@ -2,9 +2,7 @@ import {
   PublicClientApplication,
   type DeviceCodeRequest,
   type AuthenticationResult,
-  type AccountInfo,
   type SilentFlowRequest,
-  TokenCacheContext,
 } from "@azure/msal-node";
 import { readFile, writeFile, mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";

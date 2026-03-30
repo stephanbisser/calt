@@ -1,4 +1,4 @@
-import type { ScanReport, CategoryReport, RuleResult, DiffReport } from "../core/types.js";
+import type { ScanReport, CategoryReport, DiffReport } from "../core/types.js";
 
 export function formatAsMarkdown(report: ScanReport): string {
   const lines: string[] = [];

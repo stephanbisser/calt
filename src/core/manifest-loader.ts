@@ -3,7 +3,6 @@ import { resolve, dirname } from "node:path";
 import type {
   DeclarativeAgentManifest,
   LoadedAgent,
-  AgentSource,
   DataverseBot,
 } from "./types.js";
 import { BotComponentType } from "./types.js";
