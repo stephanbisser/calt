@@ -114,11 +114,14 @@ export async function statusCommand(options: {
           console.log(chalk.gray("  (could not decode token claims)"));
         }
         console.log("");
+        // Security: the raw token grants API access — only print it when
+        // explicitly requested via --raw, and always warn on stderr so
+        // automated pipelines don't silently leak credentials.
         if (options.raw) {
-          console.log(chalk.gray("  Raw token (for debugging with curl/Postman):"));
+          console.error(chalk.yellow("⚠ Warning: Raw token output. Do not share or log this token."));
           console.log(token);
         } else {
-          const masked = token.slice(0, 12) + "..." + token.slice(-8);
+          const masked = token.slice(0, 8) + "..." + token.slice(-4);
           console.log(chalk.gray(`  Token:   ${masked} (${token.length} chars)`));
           console.log(chalk.gray("  Tip: add --raw to show the full token."));
         }
