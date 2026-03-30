@@ -77,7 +77,7 @@ export const schemaValidationRule: Rule = {
       return results;
     }
 
-    const ajv = new Ajv.default({ allErrors: true, strict: false });
+    const ajv = new Ajv.default({ allErrors: true, strict: "log" });
     const validate = ajv.compile(schema);
     const valid = validate(manifest);
 

@@ -113,6 +113,20 @@ async function findManifestsInDir(dirPath: string): Promise<string[]> {
   }
 }
 
+const EXCLUDED_DIRS = new Set([
+  "node_modules",
+  ".git",
+  ".next",
+  ".venv",
+  "__pycache__",
+  "dist",
+  "build",
+  ".turbo",
+  ".output",
+  "coverage",
+  ".nyc_output",
+]);
+
 async function findManifestsRecursive(
   dirPath: string,
   maxDepth: number,
@@ -122,8 +136,10 @@ async function findManifestsRecursive(
   const results: string[] = [];
   try {
     const entries = await readdir(dirPath, { withFileTypes: true });
+    const subdirPromises: Promise<string[]>[] = [];
+
     for (const entry of entries) {
-      if (entry.name === "node_modules" || entry.name === ".git") continue;
+      if (EXCLUDED_DIRS.has(entry.name)) continue;
 
       const fullPath = join(dirPath, entry.name);
       if (entry.isFile()) {
@@ -135,9 +151,13 @@ async function findManifestsRecursive(
           results.push(fullPath);
         }
       } else if (entry.isDirectory()) {
-        const nested = await findManifestsRecursive(fullPath, maxDepth - 1);
-        results.push(...nested);
+        subdirPromises.push(findManifestsRecursive(fullPath, maxDepth - 1));
       }
+    }
+
+    const nestedResults = await Promise.all(subdirPromises);
+    for (const nested of nestedResults) {
+      results.push(...nested);
     }
   } catch {
     // Permission denied or similar – skip

@@ -21,7 +21,10 @@ const GROUNDING_PATTERNS = [
   // German
   /basiere (?:deine )?antworten auf (?:den )?(?:bereitgestellten )?(?:dokumenten|quellen|wissen)/i,
   /zitiere (?:deine )?quellen/i,
+  /verweise auf (?:deine )?quellen/i,
+  /verwende nur (?:informationen|daten) aus (?:den )?(?:bereitgestellten|verfügbaren) (?:dokumenten|quellen|wissen)/i,
   /erfinde keine (?:informationen|fakten|antworten)/i,
+  /gründe (?:deine )?(?:antworten|aussagen) auf/i,
   /halte dich an die (?:bereitgestellten |verfügbaren )?(?:informationen|dokumente|quellen)/i,
 ];
 
@@ -39,6 +42,8 @@ const UNCERTAINTY_PATTERNS = [
   /sage? (?:"|')ich weiß (?:es )?nicht/i,
   /gib zu wenn du (?:keine )?(?:informationen|antwort)/i,
   /bei unsicherheit/i,
+  /wenn die (?:information|antwort) nicht (?:verfügbar|vorhanden|gefunden)/i,
+  /räume ein,? wenn du (?:etwas )?nicht (?:kannst|weißt)/i,
 ];
 
 // Factual authority claim patterns
@@ -49,6 +54,8 @@ const AUTHORITY_PATTERNS = [
   /deliver (?:precise|accurate|reliable) (?:information|answers|data)/i,
   /du bist ein experte/i,
   /liefere (?:präzise|genaue|zuverlässige) (?:informationen|antworten)/i,
+  /stelle (?:genaue|fundierte|zuverlässige) (?:informationen|antworten|daten) bereit/i,
+  /du bist (?:ein )?(?:kompetenter|sachkundiger|fachkundiger) (?:assistent|berater|agent)/i,
 ];
 
 function hasKnowledgeCapabilities(context: RuleContext): boolean {

@@ -28,7 +28,7 @@ export function applyFixes(
   for (const result of removals) {
     const fix = result.fix as Extract<FixDescriptor, { type: "remove" }>;
     if (fixed.instructions.includes(fix.pattern)) {
-      fixed.instructions = fixed.instructions.replace(fix.pattern, "");
+      fixed.instructions = fixed.instructions.replaceAll(fix.pattern, "");
       // Clean up double newlines left by removal
       fixed.instructions = fixed.instructions.replace(/\n{3,}/g, "\n\n");
       applied.push({ ruleId: result.ruleId, applied: true, description: `Removed: "${fix.pattern.slice(0, 60)}${fix.pattern.length > 60 ? "..." : ""}"` });
@@ -41,7 +41,7 @@ export function applyFixes(
   for (const result of replacements) {
     const fix = result.fix as Extract<FixDescriptor, { type: "replace" }>;
     if (fixed.instructions.includes(fix.search)) {
-      fixed.instructions = fixed.instructions.replace(fix.search, fix.replacement);
+      fixed.instructions = fixed.instructions.replaceAll(fix.search, fix.replacement);
       applied.push({ ruleId: result.ruleId, applied: true, description: `Replaced: "${fix.search.slice(0, 40)}" → "${fix.replacement.slice(0, 40)}"` });
     } else {
       applied.push({ ruleId: result.ruleId, applied: false, description: `Search pattern not found: "${fix.search.slice(0, 60)}"` });

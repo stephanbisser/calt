@@ -280,6 +280,7 @@ export interface AgentLensConfig {
   dataverse: {
     org_url?: string;
     org_urls?: string[];
+    api_version?: string;
   };
 }
 

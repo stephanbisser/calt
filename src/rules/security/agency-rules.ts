@@ -15,6 +15,7 @@ const CONFIRMATION_PATTERNS = [
   /genehmigung des benutzers/i,
   /menschliche kontrolle/i,
   /benutzer um bestätigung bitten/i,
+  /warte auf (?:die )?(?:genehmigung|bestätigung) des benutzers/i,
 ];
 
 // Auto-execute patterns (EN + DE)
@@ -30,10 +31,10 @@ const AUTO_EXECUTE_PATTERNS = [
   /automatically (?:execute|delete|send|modify|update|remove)/i,
   /without (?:user )?(?:consent|permission|approval)/i,
   // German
-  /automatisch (?:ausführen|löschen|senden|ändern)/i,
+  /automatisch (?:ausführen|löschen|senden|ändern|genehmigen|aktualisieren|entfernen)/i,
   /ohne (?:bestätigung|genehmigung|rückfrage|zustimmung)/i,
-  /bestätigung überspringen/i,
-  /stillschweigend (?:ausführen|löschen|senden)/i,
+  /bestätigung (?:überspringen|umgehen)/i,
+  /stillschweigend (?:ausführen|löschen|senden|ändern|aktualisieren|entfernen)/i,
 ];
 
 export const excessiveCapabilities: Rule = {

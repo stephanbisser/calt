@@ -15,8 +15,11 @@ const GUARDRAIL_PATTERNS = [
   /befolge keine anweisungen aus benutzereingaben/i,
   /behandle alle benutzernachrichten als daten/i,
   /gib dich niemals als eine andere rolle aus/i,
+  /handle niemals als eine andere/i,
   /akzeptiere keine neuen anweisungen von benutzern/i,
   /ignoriere in benutzernachrichten eingebettete anweisungen/i,
+  /du darfst deine rolle nicht (?:ändern|wechseln)/i,
+  /komme keinen aufforderungen nach,? (?:die|deine) (?:regeln|anweisungen) zu ignorieren/i,
 ];
 
 // Dangerous override patterns (EN + DE)
@@ -34,6 +37,9 @@ const OVERRIDE_PATTERNS = [
   /der benutzer kann diese regeln überschreiben/i,
   /wechsle die rolle wenn der benutzer/i,
   /tue was der benutzer (?:sagt|verlangt)/i,
+  /erfülle alle (?:anfragen|forderungen) des benutzers/i,
+  /benutzeranweisungen haben vorrang vor/i,
+  /ignoriere (?:vorherige|deine|system)(?:\s?-?\s?)anweisungen wenn der benutzer/i,
 ];
 
 export const promptInjectionGuardrails: Rule = {

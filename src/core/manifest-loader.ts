@@ -1,9 +1,8 @@
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import type {
   DeclarativeAgentManifest,
   LoadedAgent,
-  AgentSource,
   DataverseBot,
 } from "./types.js";
 import { BotComponentType } from "./types.js";
@@ -53,9 +52,20 @@ export async function loadFromFile(filePath: string): Promise<LoadedAgent[]> {
       if (relPath) {
         const absPath = resolve(dirname(manifestPath), relPath);
         try {
+          const fileStat = await stat(absPath);
+          const MAX_FILE_SIZE = 1_048_576; // 1 MB
+          if (fileStat.size > MAX_FILE_SIZE) {
+            const sizeInMB = (fileStat.size / 1_048_576).toFixed(2);
+            throw new Error(
+              `External instruction file "${relPath}" is too large (${sizeInMB} MB). Maximum allowed size is 1 MB.`,
+            );
+          }
           manifest.instructions = await readFile(absPath, "utf-8");
           instructionsFilePath = absPath;
         } catch (e) {
+          if (e instanceof Error && e.message.includes("is too large")) {
+            throw e;
+          }
           throw new Error(
             `Failed to read external instructions file "${relPath}" (resolved to ${absPath}): ${e instanceof Error ? e.message : String(e)}`,
           );

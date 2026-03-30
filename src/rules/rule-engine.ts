@@ -69,6 +69,12 @@ const CATEGORY_NAMES: Record<RuleCategory, string> = {
   security: "Security (OWASP LLM Top 10)",
 };
 
+// Pre-computed map from rule ID → category (avoids rebuilding on every call)
+const ruleIdToCategory = new Map<string, RuleCategory>();
+for (const rule of ALL_RULES) {
+  ruleIdToCategory.set(rule.id, rule.category);
+}
+
 function runRules(
   rules: Rule[],
   context: RuleContext,
@@ -242,12 +248,6 @@ function buildCategoryReportFromResults(
   category: RuleCategory,
   allResults: RuleResult[],
 ): CategoryReport {
-  // Map rule IDs to categories
-  const ruleIdToCategory = new Map<string, RuleCategory>();
-  for (const rule of [...ALL_RULES, ...INSTRUCTION_RULES]) {
-    ruleIdToCategory.set(rule.id, rule.category);
-  }
-
   const categoryResults = allResults.filter(
     (r) => ruleIdToCategory.get(r.ruleId) === category,
   );

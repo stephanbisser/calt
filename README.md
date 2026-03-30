@@ -267,7 +267,7 @@ CALT exits with code `1` when errors are found, making it usable as a CI gate:
 ## Project Structure
 
 ```
-agentlens/
+calt/
 ├── src/
 │   ├── index.ts                    # CLI entry point (commander)
 │   ├── commands/                   # scan, lint, validate, fix, diff, fetch, login, init, setup, report
@@ -332,6 +332,69 @@ npm run lint
 ## Token Security
 
 Authentication tokens are stored in `~/.calt/token-cache.json` with file permissions `0600` (owner-only read/write). Do not commit this directory to version control.
+
+## Programmatic API
+
+CALT can be used as a library (e.g., from a VS Code extension or custom tooling).
+
+### Installation
+
+```bash
+npm install calt-cli
+```
+
+### Import
+
+```typescript
+import {
+  loadConfig,
+  loadFromFile,
+  runFullScan,
+  runInstructionLint,
+  runSchemaValidation,
+  applyFixes,
+  diffManifests,
+  formatAsJson,
+  formatAsMarkdown,
+  formatAsHtml,
+  detectProject,
+} from "calt-cli";
+```
+
+### Exported Functions
+
+| Function | Description |
+|----------|-------------|
+| `loadConfig(dir?)` | Load and merge `.caltrc.json` with defaults |
+| `loadFromFile(path)` | Load an agent manifest from a local file |
+| `loadFromRemote(id, token)` | Fetch a single agent from Microsoft Graph API |
+| `loadAllFromRemote(token)` | Fetch all agents from a tenant via Graph API |
+| `loadFromDataverse(orgUrl, token)` | Load a Copilot Studio agent from Dataverse |
+| `listDataverseBots(orgUrl, token)` | List all Copilot Studio bots in a Dataverse org |
+| `runFullScan(agent, config)` | Run all checks (schema + instructions + knowledge + actions + starters) |
+| `runInstructionLint(agent, config)` | Run instruction-quality checks only |
+| `runSchemaValidation(agent, config)` | Run schema validation only |
+| `applyFixes(agent, descriptors)` | Auto-fix detected issues |
+| `diffManifests(a, b)` | Structured diff between two agent manifests |
+| `detectProject(dir)` | Auto-detect project type (Teams Toolkit, Agents Toolkit, etc.) |
+
+### Example
+
+```typescript
+import { loadConfig, loadFromFile, runFullScan, formatAsJson } from "calt-cli";
+
+const config = await loadConfig();
+const agent = await loadFromFile("./appPackage/declarativeAgent.json");
+const report = await runFullScan(agent, config);
+
+if (report.error_count > 0) {
+  console.error(formatAsJson(report));
+  process.exit(1);
+}
+console.log(`✅ ${agent.metadata.name}: no errors found`);
+```
+
+Types such as `AgentLensConfig`, `ScanReport`, `RuleResult`, `LoadedAgent`, `FixDescriptor`, `DiffReport`, and others are also exported for full type safety.
 
 ## Contributing
 

@@ -1,10 +1,10 @@
 # CALT Roadmap
 
-Ideas and enhancements for future development. Items marked **[planned]** have implementation plans; others are tracked here for later prioritization.
+Ideas and enhancements for future development. Items in **Completed** have been implemented; others are tracked here for later prioritization.
 
 ---
 
-## Planned (implementation in progress)
+## Completed
 
 - **Auto-fix mode (`calt fix` / `--fix`)** — Automatically scaffold missing sections, remove secrets, deduplicate starters, add guardrail boilerplate.
 - **Plugin/action manifest validation** — Open and validate OpenAPI specs inside action plugin files, check operationIds, auth config, cross-reference with instructions.

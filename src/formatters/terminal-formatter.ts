@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import type { ScanReport, CategoryReport, RuleResult, CopilotPackage, DataverseBot, AgentType } from "../core/types.js";
+import type { ScanReport, CategoryReport, CopilotPackage, DataverseBot, AgentType } from "../core/types.js";
 
 // ─── Remote Agent Summary (unified across Graph + Dataverse) ────────────────
 

@@ -159,4 +159,26 @@ describe("loadFromFile with external instruction files", () => {
       await cleanup();
     }
   });
+
+  it("should throw when external instruction file exceeds 1 MB", async () => {
+    tempDir = await mkdtemp(join(tmpdir(), "agentlens-test-"));
+    // Create a file just over 1 MB
+    const bigContent = "x".repeat(1_048_577);
+    await writeFile(join(tempDir, "huge.txt"), bigContent, "utf-8");
+
+    const manifest = {
+      name: "Test Agent",
+      description: "A test agent",
+      instructions: "$[file('huge.txt')]",
+    };
+    await writeFile(join(tempDir, "declarativeAgent.json"), JSON.stringify(manifest, null, 2), "utf-8");
+
+    try {
+      await expect(
+        loadFromFile(join(tempDir, "declarativeAgent.json")),
+      ).rejects.toThrow(/is too large.*Maximum allowed size is 1 MB/);
+    } finally {
+      await cleanup();
+    }
+  });
 });
