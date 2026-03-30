@@ -14,6 +14,7 @@ import { setupCommand } from "./commands/setup.js";
 import { diffCommand } from "./commands/diff.js";
 import { fixCommand } from "./commands/fix.js";
 import { initCommand } from "./commands/init.js";
+import { watchCommand } from "./commands/watch.js";
 import { setQuiet } from "./utils/logger.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -126,7 +127,7 @@ program
   .option("--id <package-id>", "Remote agent package ID (with --remote)")
   .option("--all", "Scan all agents from tenant (with --remote)")
   .option("--config <path>", "Path to .caltrc.json")
-  .option("--format <type>", "Output format: terminal, json, markdown", "terminal")
+  .option("--format <type>", "Output format: terminal, json, markdown, sarif", "terminal")
   .option("--verbose", "Show detailed output")
   .option("--fix", "Auto-fix applicable issues")
   .option("--client-id <id>", "Custom Entra App client ID")
@@ -159,7 +160,7 @@ program
   .option("--id <package-id>", "Remote agent package ID (with --remote)")
   .option("--all", "Lint all agents from tenant (with --remote)")
   .option("--config <path>", "Path to .caltrc.json")
-  .option("--format <type>", "Output format: terminal, json, markdown", "terminal")
+  .option("--format <type>", "Output format: terminal, json, markdown, sarif", "terminal")
   .option("--client-id <id>", "Custom Entra App client ID")
   .option("--tenant <tenant-id>", "Specific tenant ID")
   .addOption(
@@ -209,8 +210,8 @@ program
 program
   .command("report")
   .argument("[path]", "Path to agent manifest or project directory")
-  .description("Generate a report in json, markdown, or html format")
-  .requiredOption("--format <type>", "Report format: json, markdown, html")
+  .description("Generate a report in json, markdown, html, or sarif format")
+  .requiredOption("--format <type>", "Report format: json, markdown, html, sarif")
   .option("--output <file>", "Save report to file instead of stdout")
   .option("--remote", "Fetch agent from tenant instead of local file")
   .option("--id <package-id>", "Remote agent package ID (with --remote)")
@@ -248,8 +249,10 @@ program
 
 program
   .command("init")
-  .description("Create a .caltrc.json config file in the current directory")
-  .option("--force", "Overwrite existing config file")
+  .description("Initialize CALT config and optionally scaffold an agent manifest")
+  .option("-t, --template <type>", "Create agent manifest from template (basic, enterprise, minimal)")
+  .option("-o, --output <path>", "Output path for the agent manifest", "declarativeAgent.json")
+  .option("--force", "Overwrite existing files")
   .action(withErrorHandler(async (options) => {
     await initCommand(options);
   }));
@@ -264,6 +267,30 @@ program
   .option("--dry-run", "Show what would change without modifying files")
   .action(withErrorHandler(async (path, options) => {
     await fixCommand(path, options);
+  }));
+
+// ─── Watch ──────────────────────────────────────────────────────────────────
+
+program
+  .command("watch")
+  .argument("[path]", "Path to agent manifest or project directory")
+  .description("Watch agent files and re-scan on changes")
+  .option("--remote", "Fetch agent from tenant instead of local file")
+  .option("--id <package-id>", "Remote agent package ID (with --remote)")
+  .option("--all", "Watch all agents from tenant (with --remote)")
+  .option("--config <path>", "Path to .caltrc.json")
+  .option("--format <type>", "Output format: terminal, json, markdown, sarif", "terminal")
+  .option("--verbose", "Show detailed output")
+  .option("--client-id <id>", "Custom Entra App client ID")
+  .option("--tenant <tenant-id>", "Specific tenant ID")
+  .addOption(
+    new Option("--type <type>", "Agent type filter")
+      .choices(AGENT_TYPE_CHOICES)
+      .default("all"),
+  )
+  .option("--org-url <url>", "Dataverse organization URL")
+  .action(withErrorHandler(async (path, options) => {
+    await watchCommand(path, options);
   }));
 
 program.parse();

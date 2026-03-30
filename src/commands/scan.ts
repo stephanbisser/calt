@@ -3,6 +3,7 @@ import { runFullScan } from "../rules/rule-engine.js";
 import { formatScanReport } from "../formatters/terminal-formatter.js";
 import { formatAsJson } from "../formatters/json-formatter.js";
 import { formatAsMarkdown } from "../formatters/markdown-formatter.js";
+import { formatAsSarif } from "../formatters/sarif-formatter.js";
 import { resolveAgents, type RemoteOptions } from "./shared/resolve-agents.js";
 import type { ReportFormat, ScanReport } from "../core/types.js";
 
@@ -50,6 +51,9 @@ function outputReports(
         break;
       case "markdown":
         console.log(formatAsMarkdown(report));
+        break;
+      case "sarif":
+        console.log(formatAsSarif(report));
         break;
       case "terminal":
       default:

@@ -48,6 +48,7 @@
   "files": [
     "dist",
     "schemas",
+    "action.yml",
     "!dist/**/*.js.map",
     "!dist/**/*.d.ts.map"
   ],

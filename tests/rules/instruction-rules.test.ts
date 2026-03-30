@@ -70,6 +70,18 @@ describe("Instruction Structure Rules", () => {
       const result = hasPurposeSection.check(makeContext({ instructions: "Do stuff. Answer questions." }));
       expect((result as any).passed).toBe(false);
     });
+
+    it("INST-004 provides append-section fix for missing purpose", () => {
+      const result = hasPurposeSection.check(makeContext({ instructions: "Do stuff. Answer questions." }));
+      expect((result as any).fix).toBeDefined();
+      expect((result as any).fix.type).toBe("append-section");
+      expect((result as any).fix.content).toContain("## Purpose");
+    });
+
+    it("INST-004 does not provide fix when purpose exists", () => {
+      const result = hasPurposeSection.check(makeContext({ instructions: "# OBJECTIVE\nYou are a helpful assistant." }));
+      expect((result as any).fix).toBeUndefined();
+    });
   });
 
   describe("INST-005: has-markdown-structure", () => {
@@ -92,6 +104,19 @@ describe("Instruction Structure Rules", () => {
       const result = hasMarkdownStructure.check(makeContext({ instructions: "Just plain text with no structure at all." }));
       expect((result as any).passed).toBe(false);
     });
+
+    it("INST-005 provides replace fix for plain text instructions", () => {
+      const result = hasMarkdownStructure.check(makeContext({ instructions: "Just plain text with no structure at all." }));
+      expect((result as any).fix).toBeDefined();
+      expect((result as any).fix.type).toBe("replace");
+      expect((result as any).fix.replacement).toContain("## Purpose");
+      expect((result as any).fix.replacement).toContain("## Guidelines");
+    });
+
+    it("INST-005 does not provide fix when markdown structure exists", () => {
+      const result = hasMarkdownStructure.check(makeContext({ instructions: "# Section\nContent here" }));
+      expect((result as any).fix).toBeUndefined();
+    });
   });
 
   describe("INST-008: has-workflow-steps", () => {
@@ -103,6 +128,18 @@ describe("Instruction Structure Rules", () => {
     it("should pass with workflow section", () => {
       const result = hasWorkflowSteps.check(makeContext({ instructions: "# Workflow\nFollow these steps..." }));
       expect((result as any).passed).toBe(true);
+    });
+
+    it("INST-008 provides append-section fix for missing workflow", () => {
+      const result = hasWorkflowSteps.check(makeContext({ instructions: "Do stuff. Answer questions." }));
+      expect((result as any).fix).toBeDefined();
+      expect((result as any).fix.type).toBe("append-section");
+      expect((result as any).fix.content).toContain("## Workflow");
+    });
+
+    it("INST-008 does not provide fix when workflow exists", () => {
+      const result = hasWorkflowSteps.check(makeContext({ instructions: "1. First\n2. Second\n3. Third" }));
+      expect((result as any).fix).toBeUndefined();
     });
   });
 });
@@ -144,6 +181,23 @@ describe("Instruction Language Rules", () => {
         instructions: "Maybe try to help. If possible, sometimes provide answers.",
       }));
       expect((result as any).passed).toBe(false);
+    });
+
+    it("INST-007 provides replace fix for vague phrases", () => {
+      const result = avoidsVagueLanguage.check(makeContext({
+        instructions: "If possible, provide answers to the user.",
+      }));
+      expect((result as any).fix).toBeDefined();
+      expect((result as any).fix.type).toBe("replace");
+      expect((result as any).fix.search).toBe("If possible");
+      expect((result as any).fix.replacement).toBe("when the information is available in the provided knowledge sources");
+    });
+
+    it("INST-007 does not provide fix when language is clear", () => {
+      const result = avoidsVagueLanguage.check(makeContext({
+        instructions: "Search for documents. Provide direct answers.",
+      }));
+      expect((result as any).fix).toBeUndefined();
     });
   });
 

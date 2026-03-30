@@ -1,0 +1,94 @@
+name: "CALT - Copilot Agent Lint Tool"
+description: "Lint and validate Microsoft 365 Copilot Agent configurations"
+author: "Stephan Bisser"
+
+branding:
+  icon: "check-circle"
+  color: "blue"
+
+inputs:
+  path:
+    description: "Path to agent manifest or directory containing manifests"
+    required: false
+    default: "."
+  format:
+    description: "Output format (terminal, json, sarif)"
+    required: false
+    default: "terminal"
+  fail-on:
+    description: "Minimum severity to fail the action (error, warning, off)"
+    required: false
+    default: "error"
+  config:
+    description: "Path to .caltrc.json config file"
+    required: false
+  sarif-upload:
+    description: "Upload SARIF results to GitHub Code Scanning (true/false)"
+    required: false
+    default: "false"
+
+outputs:
+  exit-code:
+    description: "Exit code from calt scan (0=pass, 1=errors found, 2=crash)"
+    value: ${{ steps.scan.outputs.exit-code }}
+  sarif-file:
+    description: "Path to SARIF output file (if format=sarif or sarif-upload=true)"
+    value: ${{ steps.scan.outputs.sarif-file }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+
+    - name: Install CALT
+      shell: bash
+      run: npm install -g calt-cli
+
+    - name: Run CALT Scan
+      id: scan
+      shell: bash
+      run: |
+        EXIT_CODE=0
+
+        # Build scan command
+        SCAN_CMD="calt scan ${{ inputs.path }}"
+
+        if [ "${{ inputs.config }}" != "" ]; then
+          SCAN_CMD="$SCAN_CMD --config ${{ inputs.config }}"
+        fi
+
+        # If SARIF upload is requested, always generate SARIF
+        if [ "${{ inputs.sarif-upload }}" = "true" ]; then
+          SCAN_CMD="$SCAN_CMD --format sarif"
+          $SCAN_CMD > calt-results.sarif || EXIT_CODE=$?
+          echo "sarif-file=calt-results.sarif" >> $GITHUB_OUTPUT
+        elif [ "${{ inputs.format }}" = "sarif" ]; then
+          $SCAN_CMD --format sarif > calt-results.sarif || EXIT_CODE=$?
+          echo "sarif-file=calt-results.sarif" >> $GITHUB_OUTPUT
+        else
+          $SCAN_CMD --format ${{ inputs.format }} || EXIT_CODE=$?
+        fi
+
+        echo "exit-code=$EXIT_CODE" >> $GITHUB_OUTPUT
+
+        # Determine failure threshold
+        if [ "${{ inputs.fail-on }}" = "off" ]; then
+          exit 0
+        elif [ "${{ inputs.fail-on }}" = "warning" ]; then
+          exit $EXIT_CODE
+        else
+          # fail-on: error (default) — only fail on exit code 1+
+          if [ $EXIT_CODE -ge 1 ]; then
+            exit 1
+          fi
+        fi
+
+    - name: Upload SARIF to GitHub
+      if: inputs.sarif-upload == 'true' && always()
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: calt-results.sarif
+        category: "calt"

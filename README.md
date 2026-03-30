@@ -92,6 +92,7 @@ calt scan ./declarativeAgent.json              # Scan a local manifest
 calt scan ./my-agent-project                   # Scan a project folder
 calt scan                                      # Scan current directory
 calt scan --format json                        # JSON output (for CI/CD)
+calt scan --format sarif                       # SARIF output (for GitHub Code Scanning)
 calt scan --verbose                            # Show all passed checks
 calt scan --fix ./declarativeAgent.json        # Auto-fix issues
 calt scan --remote --all                       # Scan all tenant agents
@@ -152,6 +153,14 @@ calt logout                                    # Clear cached tokens
 calt setup                                     # Automated Entra App registration (needs Azure CLI)
 calt setup --login                             # Setup + login in one step
 calt init                                      # Create .caltrc.json config only
+
+# Scaffold a new agent manifest from template
+calt init --template basic                     # Standard agent with instructions + starters
+calt init --template enterprise                # Enterprise agent with SharePoint, WebSearch, security
+calt init --template minimal                   # Bare minimum valid manifest
+
+# Custom output path
+calt init --template basic --output agents/my-agent.json
 ```
 
 ### Report — export results
@@ -159,8 +168,18 @@ calt init                                      # Create .caltrc.json config only
 ```bash
 calt report ./declarativeAgent.json --format json
 calt report ./declarativeAgent.json --format markdown
+calt report ./declarativeAgent.json --format sarif
 calt report ./declarativeAgent.json --format html --output report.html
 calt report --remote --all --format markdown
+```
+
+### Watch — re-scan on file changes
+
+```bash
+calt watch ./declarativeAgent.json             # Watch and re-scan on changes
+calt watch ./my-agent-project                  # Watch a project directory
+calt watch --format json                       # Watch with JSON output
+calt watch --verbose                           # Watch with detailed output
 ```
 
 ### Exit Codes
@@ -262,6 +281,60 @@ Override rule severities or turn rules off:
 | `CS-003` | starter-has-text | error |
 | `CS-004` | starter-no-duplicates | warning |
 
+## GitHub Action
+
+Use CALT directly in your GitHub Actions workflow to lint agent manifests on every PR.
+
+### Quick Start
+
+```yaml
+# .github/workflows/agent-lint.yml
+name: Lint Copilot Agents
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: stephanbisser/calt@main
+        with:
+          path: ./agents/
+```
+
+### With SARIF Upload (GitHub Code Scanning)
+
+```yaml
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: stephanbisser/calt@main
+        with:
+          path: ./agents/
+          sarif-upload: "true"
+```
+
+### Inputs
+
+| Input | Description | Default |
+|-------|-------------|---------|
+| `path` | Path to agent manifest or directory | `.` |
+| `format` | Output format (`terminal`, `json`, `sarif`) | `terminal` |
+| `fail-on` | Minimum severity to fail (`error`, `warning`, `off`) | `error` |
+| `config` | Path to `.caltrc.json` | — |
+| `sarif-upload` | Upload SARIF to GitHub Code Scanning | `false` |
+
+### Outputs
+
+| Output | Description |
+|--------|-------------|
+| `exit-code` | Exit code (0=pass, 1=errors, 2=crash) |
+| `sarif-file` | Path to SARIF file (if generated) |
+
 ## CI/CD Integration
 
 CALT exits with code `1` when errors are found, making it usable as a CI gate:
@@ -272,13 +345,33 @@ CALT exits with code `1` when errors are found, making it usable as a CI gate:
   run: npx calt-cli scan ./agents/ --format json
 ```
 
+### SARIF Integration
+
+Generate SARIF output for integration with GitHub Code Scanning, Azure DevOps, or VS Code:
+
+```bash
+calt scan ./agent.json --format sarif > results.sarif
+```
+
+Upload to GitHub Code Scanning via the `github/codeql-action/upload-sarif` action:
+
+```yaml
+- name: Scan Copilot Agent
+  run: npx calt-cli scan ./agents/ --format sarif > results.sarif
+  continue-on-error: true
+- name: Upload SARIF
+  uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: results.sarif
+```
+
 ## Project Structure
 
 ```
 calt/
 ├── src/
 │   ├── index.ts                    # CLI entry point (commander)
-│   ├── commands/                   # scan, lint, validate, fix, diff, fetch, login, init, setup, report
+│   ├── commands/                   # scan, lint, validate, fix, diff, fetch, login, init, setup, report, watch
 │   ├── core/
 │   │   ├── types.ts                # All TypeScript interfaces
 │   │   ├── index.ts                # Public API (for VS Code extension reuse)
@@ -301,7 +394,7 @@ calt/
 │   │   ├── actions/                # Plugin file checks
 │   │   ├── conversation-starters/  # Starter validation
 │   │   └── security/               # OWASP LLM Top 10 rules
-│   ├── formatters/                 # terminal (chalk), json, markdown, html
+│   ├── formatters/                 # terminal (chalk), json, markdown, html, sarif
 │   └── utils/                      # URL validator, Markdown parser
 ├── schemas/
 │   └── config.schema.json          # JSON Schema for .caltrc.json
@@ -365,6 +458,7 @@ import {
   formatAsJson,
   formatAsMarkdown,
   formatAsHtml,
+  formatAsSarif,
   detectProject,
 } from "calt-cli";
 ```
