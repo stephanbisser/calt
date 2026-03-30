@@ -1,4 +1,4 @@
-import type { Rule, RuleContext, RuleResult } from "../../core/types.js";
+import type { Rule, RuleContext, RuleResult, FixDescriptor } from "../../core/types.js";
 
 // Actionable verbs in English and German
 const ACTIONABLE_VERBS_EN = [
@@ -29,6 +29,22 @@ const VAGUE_PHRASES_DE = [
   "eventuell", "ungefähr", "in etwa", "möglicherweise",
   "unter umständen", "gegebenenfalls",
 ];
+
+const VAGUE_REPLACEMENTS: Record<string, string> = {
+  "do your best": "follow the guidelines precisely",
+  "try to help": "provide actionable answers with specific details",
+  "be helpful": "provide step-by-step guidance when answering questions",
+  "as needed": "when the user explicitly requests it",
+  "if possible": "when the information is available in the provided knowledge sources",
+  "etc.": "",
+  "and so on": "",
+  "things like that": "",
+  "try to": "",
+  "maybe": "",
+  "perhaps": "",
+  "sort of": "",
+  "kind of": "",
+};
 
 export const usesActionableVerbs: Rule = {
   id: "INST-006",
@@ -70,6 +86,28 @@ export const avoidsVagueLanguage: Rule = {
     const allPhrases = [...VAGUE_PHRASES_EN, ...VAGUE_PHRASES_DE];
     const found = allPhrases.filter((p) => inst.includes(p));
 
+    // Find the first vague phrase that has a replacement mapping
+    let fix: FixDescriptor | undefined;
+    if (found.length > 0) {
+      const originalInst = context.manifest.instructions ?? "";
+      for (const phrase of found) {
+        const replacement = VAGUE_REPLACEMENTS[phrase];
+        if (replacement !== undefined) {
+          // Find the phrase in the original (case-insensitive) to get exact match
+          const idx = originalInst.toLowerCase().indexOf(phrase);
+          if (idx !== -1) {
+            const exactPhrase = originalInst.slice(idx, idx + phrase.length);
+            fix = {
+              type: "replace" as const,
+              search: exactPhrase,
+              replacement,
+            };
+            break;
+          }
+        }
+      }
+    }
+
     return {
       ruleId: this.id,
       ruleName: this.name,
@@ -84,6 +122,7 @@ export const avoidsVagueLanguage: Rule = {
           ? "Replace vague phrases with definitive instructions. " +
             'Instead of "try to help", use "help". Instead of "if possible, search", use "search".'
           : undefined,
+      fix,
     };
   },
 };
