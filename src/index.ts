@@ -142,9 +142,9 @@ program
       if (options.format !== "terminal" || options.verbose || options.remote || options.all || options.id) {
         console.error(chalk.yellow("Note: --fix mode ignores --format, --verbose, --remote, and other options.\n"));
       }
-      await fixCommand(path, { config: options.config });
+      return await fixCommand(path, { config: options.config });
     } else {
-      await scanCommand(path, options);
+      return await scanCommand(path, options);
     }
   }));
 
@@ -173,9 +173,9 @@ program
       if (options.format !== "terminal" || options.remote || options.all || options.id) {
         console.error(chalk.yellow("Note: --fix mode ignores --format, --remote, and other options.\n"));
       }
-      await fixCommand(path, { config: options.config });
+      return await fixCommand(path, { config: options.config });
     } else {
-      await lintCommand(path, options);
+      return await lintCommand(path, options);
     }
   }));
 
@@ -189,7 +189,7 @@ program
   .option("--format <type>", "Output format: terminal, json, markdown", "terminal")
   .option("--verbose", "Show detailed output")
   .action(withErrorHandler(async (path, options) => {
-    await validateCommand(path, options);
+    return await validateCommand(path, options);
   }));
 
 // ─── Setup ───────────────────────────────────────────────────────────────────
@@ -225,7 +225,7 @@ program
   )
   .option("--org-url <url>", "Dataverse organization URL")
   .action(withErrorHandler(async (path, options) => {
-    await reportCommand(path, options);
+    return await reportCommand(path, options);
   }));
 
 // ─── Diff ───────────────────────────────────────────────────────────────────
@@ -241,7 +241,7 @@ program
   .option("--tenant <id>", "Tenant ID")
   .option("--org-url <url>", "Dataverse org URL")
   .action(withErrorHandler(async (source1, source2, options) => {
-    await diffCommand(source1, source2, options);
+    return await diffCommand(source1, source2, options);
   }));
 
 // ─── Init ───────────────────────────────────────────────────────────────────
