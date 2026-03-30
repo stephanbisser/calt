@@ -152,6 +152,14 @@ calt logout                                    # Clear cached tokens
 calt setup                                     # Automated Entra App registration (needs Azure CLI)
 calt setup --login                             # Setup + login in one step
 calt init                                      # Create .caltrc.json config only
+
+# Scaffold a new agent manifest from template
+calt init --template basic                     # Standard agent with instructions + starters
+calt init --template enterprise                # Enterprise agent with SharePoint, WebSearch, security
+calt init --template minimal                   # Bare minimum valid manifest
+
+# Custom output path
+calt init --template basic --output agents/my-agent.json
 ```
 
 ### Report — export results

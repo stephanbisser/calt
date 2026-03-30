@@ -248,8 +248,10 @@ program
 
 program
   .command("init")
-  .description("Create a .caltrc.json config file in the current directory")
-  .option("--force", "Overwrite existing config file")
+  .description("Initialize CALT config and optionally scaffold an agent manifest")
+  .option("-t, --template <type>", "Create agent manifest from template (basic, enterprise, minimal)")
+  .option("-o, --output <path>", "Output path for the agent manifest", "declarativeAgent.json")
+  .option("--force", "Overwrite existing files")
   .action(withErrorHandler(async (options) => {
     await initCommand(options);
   }));
