@@ -6,7 +6,7 @@ Thanks for your interest in contributing to CALT! Here's how to get started.
 
 ```bash
 git clone https://github.com/stephanbisser/calt.git
-cd agentlens
+cd calt
 npm install
 npm run build
 npm test

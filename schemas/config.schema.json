@@ -61,6 +61,22 @@
           "description": "Entra tenant ID"
         }
       }
+    },
+    "dataverse": {
+      "type": "object",
+      "description": "Dataverse connection settings for Copilot Studio agent scanning",
+      "properties": {
+        "org_url": {
+          "type": "string",
+          "description": "Single Dataverse organization URL"
+        },
+        "org_urls": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Multiple Dataverse organization URLs to scan"
+        }
+      },
+      "additionalProperties": false
     }
   }
 }

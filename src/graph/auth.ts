@@ -181,13 +181,21 @@ export async function getLoginStatus(config: AuthConfig): Promise<LoginStatus> {
   };
 }
 
-/** Decode the JWT payload (no verification) to inspect claims like scp. */
-export function decodeTokenPayload(token: string): Record<string, unknown> {
+/**
+ * Decode a JWT payload without verification. Returns `null` when the token is
+ * malformed or the payload cannot be parsed so callers can handle it gracefully.
+ */
+export function decodeJwtPayload(token: string): Record<string, unknown> | null {
   const parts = token.split(".");
-  if (parts.length < 2) return {};
+  if (parts.length !== 3) return null;
   try {
     return JSON.parse(Buffer.from(parts[1], "base64url").toString("utf-8")) as Record<string, unknown>;
   } catch {
-    return {};
+    return null;
   }
+}
+
+/** @deprecated Use {@link decodeJwtPayload} instead. */
+export function decodeTokenPayload(token: string): Record<string, unknown> {
+  return decodeJwtPayload(token) ?? {};
 }

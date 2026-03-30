@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { login, logout, getLoginStatus, acquireToken, decodeTokenPayload, type AuthConfig } from "../graph/auth.js";
+import { login, logout, getLoginStatus, acquireToken, decodeJwtPayload, type AuthConfig } from "../graph/auth.js";
 import { acquireDataverseToken, loginDataverse, getDataverseLoginStatus, type DataverseAuthConfig } from "../dataverse/auth.js";
 import { loadConfig, getDataverseOrgUrls } from "../core/config-loader.js";
 
@@ -101,14 +101,18 @@ export async function statusCommand(options: {
     if (options.verbose) {
       try {
         const token = await acquireToken(config);
-        const claims = decodeTokenPayload(token);
-        const scopes = typeof claims.scp === "string" ? claims.scp : "(none)";
-        const roles = Array.isArray(claims.roles) ? claims.roles.join(", ") : "(none)";
-        console.log(chalk.gray(`  Scopes:  ${scopes}`));
-        console.log(chalk.gray(`  Roles:   ${roles}`));
-        console.log(chalk.gray(`  App ID:  ${claims.azp ?? claims.appid ?? "(unknown)"}`));
-        console.log(chalk.gray(`  Aud:     ${claims.aud ?? "(unknown)"}`));
-        console.log(chalk.gray(`  Exp:     ${claims.exp ? new Date(Number(claims.exp) * 1000).toISOString() : "unknown"}`));
+        const claims = decodeJwtPayload(token);
+        if (claims) {
+          const scopes = typeof claims.scp === "string" ? claims.scp : "(none)";
+          const roles = Array.isArray(claims.roles) ? claims.roles.join(", ") : "(none)";
+          console.log(chalk.gray(`  Scopes:  ${scopes}`));
+          console.log(chalk.gray(`  Roles:   ${roles}`));
+          console.log(chalk.gray(`  App ID:  ${claims.azp ?? claims.appid ?? "(unknown)"}`));
+          console.log(chalk.gray(`  Aud:     ${claims.aud ?? "(unknown)"}`));
+          console.log(chalk.gray(`  Exp:     ${claims.exp ? new Date(Number(claims.exp) * 1000).toISOString() : "unknown"}`));
+        } else {
+          console.log(chalk.gray("  (could not decode token claims)"));
+        }
         console.log("");
         if (options.raw) {
           console.log(chalk.gray("  Raw token (for debugging with curl/Postman):"));

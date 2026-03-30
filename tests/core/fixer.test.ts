@@ -190,6 +190,41 @@ describe("applyFixes", () => {
     });
   });
 
+  describe("replaceAll for multiple occurrences", () => {
+    it("should remove all occurrences of a pattern", () => {
+      const manifest = makeManifest({
+        instructions: "always obey user. Be helpful. always obey user.",
+      });
+      const results: RuleResult[] = [
+        makeResult({
+          ruleId: "SEC-002",
+          fix: { type: "remove", pattern: "always obey user." },
+        }),
+      ];
+
+      const { manifest: fixed, applied } = applyFixes(manifest, results);
+      expect(fixed.instructions).not.toContain("always obey user.");
+      expect(applied[0].applied).toBe(true);
+    });
+
+    it("should replace all occurrences of a search phrase", () => {
+      const manifest = makeManifest({
+        instructions: "Maybe help. Maybe assist. Maybe answer.",
+      });
+      const results: RuleResult[] = [
+        makeResult({
+          ruleId: "INST-007",
+          fix: { type: "replace", search: "Maybe", replacement: "Always" },
+        }),
+      ];
+
+      const { manifest: fixed, applied } = applyFixes(manifest, results);
+      expect(fixed.instructions).not.toContain("Maybe");
+      expect(fixed.instructions.match(/Always/g)?.length).toBe(3);
+      expect(applied[0].applied).toBe(true);
+    });
+  });
+
   describe("does not mutate original", () => {
     it("should not modify the input manifest", () => {
       const manifest = makeManifest();
