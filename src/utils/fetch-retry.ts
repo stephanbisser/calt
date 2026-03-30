@@ -1,3 +1,5 @@
+/* eslint-disable no-undef -- fetch, RequestInit, Response are Node 18+ globals */
+
 const DEFAULT_TIMEOUT_MS = 30_000;
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 1_000;
