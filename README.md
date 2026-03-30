@@ -262,6 +262,60 @@ Override rule severities or turn rules off:
 | `CS-003` | starter-has-text | error |
 | `CS-004` | starter-no-duplicates | warning |
 
+## GitHub Action
+
+Use CALT directly in your GitHub Actions workflow to lint agent manifests on every PR.
+
+### Quick Start
+
+```yaml
+# .github/workflows/agent-lint.yml
+name: Lint Copilot Agents
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: stephanbisser/calt@main
+        with:
+          path: ./agents/
+```
+
+### With SARIF Upload (GitHub Code Scanning)
+
+```yaml
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: stephanbisser/calt@main
+        with:
+          path: ./agents/
+          sarif-upload: "true"
+```
+
+### Inputs
+
+| Input | Description | Default |
+|-------|-------------|---------|
+| `path` | Path to agent manifest or directory | `.` |
+| `format` | Output format (`terminal`, `json`, `sarif`) | `terminal` |
+| `fail-on` | Minimum severity to fail (`error`, `warning`, `off`) | `error` |
+| `config` | Path to `.caltrc.json` | — |
+| `sarif-upload` | Upload SARIF to GitHub Code Scanning | `false` |
+
+### Outputs
+
+| Output | Description |
+|--------|-------------|
+| `exit-code` | Exit code (0=pass, 1=errors, 2=crash) |
+| `sarif-file` | Path to SARIF file (if generated) |
+
 ## CI/CD Integration
 
 CALT exits with code `1` when errors are found, making it usable as a CI gate:
