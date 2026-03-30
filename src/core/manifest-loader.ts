@@ -23,6 +23,21 @@ export function parseFileReference(value: string): string | null {
   return match ? match[2] : null;
 }
 
+/**
+ * Recursively removes prototype-pollution keys (__proto__, constructor, prototype)
+ * from a parsed JSON value.
+ */
+function sanitizeJson(obj: unknown): unknown {
+  if (obj === null || typeof obj !== "object") return obj;
+  if (Array.isArray(obj)) return obj.map(sanitizeJson);
+  const clean: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+    if (key === "__proto__" || key === "constructor" || key === "prototype") continue;
+    clean[key] = sanitizeJson(value);
+  }
+  return clean;
+}
+
 export async function loadFromFile(filePath: string): Promise<LoadedAgent[]> {
   const project = await detectProject(filePath);
   const agents: LoadedAgent[] = [];
@@ -31,7 +46,7 @@ export async function loadFromFile(filePath: string): Promise<LoadedAgent[]> {
     const raw = await readFile(manifestPath, "utf-8");
     let manifest: DeclarativeAgentManifest;
     try {
-      manifest = JSON.parse(raw) as DeclarativeAgentManifest;
+      manifest = sanitizeJson(JSON.parse(raw)) as DeclarativeAgentManifest;
     } catch (e) {
       throw new Error(
         `Failed to parse ${manifestPath}: ${e instanceof Error ? e.message : String(e)}`,

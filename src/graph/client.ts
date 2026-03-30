@@ -1,4 +1,5 @@
 import type { CopilotPackage, CopilotPackageDetail } from "../core/types.js";
+import { fetchWithRetry } from "../utils/fetch-retry.js";
 
 // Graph API Beta endpoints – centralized for easy updates when API changes
 const GRAPH_BASE = "https://graph.microsoft.com/beta";
@@ -8,7 +9,7 @@ export class GraphClient {
   constructor(private accessToken: string) {}
 
   private async graphFetch<T>(url: string, extraHeaders?: Record<string, string>): Promise<T> {
-    const response = await fetch(url, {
+    const response = await fetchWithRetry(url, {
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
         "Content-Type": "application/json",

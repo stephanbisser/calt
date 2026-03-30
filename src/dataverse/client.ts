@@ -3,6 +3,7 @@ import type {
   DataverseBotComponent,
   DataverseListResponse,
 } from "../core/types.js";
+import { fetchWithRetry } from "../utils/fetch-retry.js";
 
 const DEFAULT_API_VERSION = "v9.2";
 
@@ -20,7 +21,7 @@ export class DataverseClient {
   }
 
   private async dvFetch<T>(url: string): Promise<T> {
-    const response = await fetch(url, {
+    const response = await fetchWithRetry(url, {
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
         Accept: "application/json",
