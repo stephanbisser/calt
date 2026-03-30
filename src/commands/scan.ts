@@ -16,15 +16,24 @@ export async function scanCommand(
 ): Promise<number | void> {
   const cfg = await loadConfig(options.config);
   const format = options.format ?? "terminal";
+  const verbose = options.verbose ?? false;
 
   const agents = await resolveAgents(pathOrUndefined, options, cfg);
 
   const reports: ScanReport[] = [];
   for (const agent of agents) {
+    if (verbose) {
+      console.log(`\nScanning agent: "${agent.manifest.name}" …`);
+    }
+    const start = performance.now();
     reports.push(await runFullScan(agent, cfg));
+    if (verbose) {
+      const elapsed = (performance.now() - start).toFixed(0);
+      console.log(`  Scan completed in ${elapsed} ms`);
+    }
   }
 
-  outputReports(reports, format, options.verbose ?? false);
+  outputReports(reports, format, verbose);
 
   if (reports.some((r) => r.summary.errors > 0)) return 1;
 }

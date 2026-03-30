@@ -14,21 +14,43 @@ import { setupCommand } from "./commands/setup.js";
 import { diffCommand } from "./commands/diff.js";
 import { fixCommand } from "./commands/fix.js";
 import { initCommand } from "./commands/init.js";
+import { setQuiet } from "./utils/logger.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function withErrorHandler(fn: (...args: any[]) => Promise<void | number>) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return async (...args: any[]) => {
-    try {
-      const code = await fn(...args);
-      if (typeof code === "number" && code !== 0) process.exit(code);
-    } catch (err) {
-      console.error(
-        chalk.red(`\n✗ ${err instanceof Error ? err.message : String(err)}\n`),
-      );
-      process.exit(1);
+    if (program.opts().quiet) {
+      setQuiet(true);
+      const originalLog = console.log;
+      const originalWarn = console.warn;
+      console.log = () => {};
+      console.warn = () => {};
+      try {
+        return await runWithErrorHandler(fn, args);
+      } finally {
+        console.log = originalLog;
+        console.warn = originalWarn;
+      }
     }
+    return runWithErrorHandler(fn, args);
   };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function runWithErrorHandler(fn: (...args: any[]) => Promise<void | number>, args: any[]) {
+  try {
+    const code = await fn(...args);
+    if (typeof code === "number" && code !== 0) process.exit(code);
+  } catch (err) {
+    const exitCode = (err instanceof Error && "exitCode" in err && typeof err.exitCode === "number")
+      ? err.exitCode
+      : 2;
+    console.error(
+      chalk.red(`\n✗ ${err instanceof Error ? err.message : String(err)}\n`),
+    );
+    process.exit(exitCode);
+  }
 }
 
 const require = createRequire(import.meta.url);
@@ -43,7 +65,8 @@ program
   .description(
     "CALT – Lint, validate, and analyze Microsoft 365 Copilot Agent configurations",
   )
-  .version(pkg.version);
+  .version(pkg.version)
+  .option("-q, --quiet", "Suppress all output except errors");
 
 // ─── Login / Logout ──────────────────────────────────────────────────────────
 
@@ -119,9 +142,9 @@ program
       if (options.format !== "terminal" || options.verbose || options.remote || options.all || options.id) {
         console.error(chalk.yellow("Note: --fix mode ignores --format, --verbose, --remote, and other options.\n"));
       }
-      await fixCommand(path, { config: options.config });
+      return await fixCommand(path, { config: options.config });
     } else {
-      await scanCommand(path, options);
+      return await scanCommand(path, options);
     }
   }));
 
@@ -150,9 +173,9 @@ program
       if (options.format !== "terminal" || options.remote || options.all || options.id) {
         console.error(chalk.yellow("Note: --fix mode ignores --format, --remote, and other options.\n"));
       }
-      await fixCommand(path, { config: options.config });
+      return await fixCommand(path, { config: options.config });
     } else {
-      await lintCommand(path, options);
+      return await lintCommand(path, options);
     }
   }));
 
@@ -166,7 +189,7 @@ program
   .option("--format <type>", "Output format: terminal, json, markdown", "terminal")
   .option("--verbose", "Show detailed output")
   .action(withErrorHandler(async (path, options) => {
-    await validateCommand(path, options);
+    return await validateCommand(path, options);
   }));
 
 // ─── Setup ───────────────────────────────────────────────────────────────────
@@ -202,7 +225,7 @@ program
   )
   .option("--org-url <url>", "Dataverse organization URL")
   .action(withErrorHandler(async (path, options) => {
-    await reportCommand(path, options);
+    return await reportCommand(path, options);
   }));
 
 // ─── Diff ───────────────────────────────────────────────────────────────────
@@ -218,7 +241,7 @@ program
   .option("--tenant <id>", "Tenant ID")
   .option("--org-url <url>", "Dataverse org URL")
   .action(withErrorHandler(async (source1, source2, options) => {
-    await diffCommand(source1, source2, options);
+    return await diffCommand(source1, source2, options);
   }));
 
 // ─── Init ───────────────────────────────────────────────────────────────────

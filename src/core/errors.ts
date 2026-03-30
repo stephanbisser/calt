@@ -7,3 +7,13 @@ export class AgentLensError extends Error {
     this.name = "AgentLensError";
   }
 }
+
+export class CaltError extends Error {
+  constructor(
+    message: string,
+    public readonly exitCode: number = 2,
+  ) {
+    super(message);
+    this.name = "CaltError";
+  }
+}

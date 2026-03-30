@@ -47,7 +47,9 @@
   },
   "files": [
     "dist",
-    "schemas"
+    "schemas",
+    "!dist/**/*.js.map",
+    "!dist/**/*.d.ts.map"
   ],
   "dependencies": {
     "@azure/msal-node": "^2.16.0",
