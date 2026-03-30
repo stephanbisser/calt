@@ -32,6 +32,7 @@ export { formatScanReport, formatLintReport, formatAgentTable } from "../formatt
 export { formatAsJson } from "../formatters/json-formatter.js";
 export { formatAsMarkdown } from "../formatters/markdown-formatter.js";
 export { formatAsHtml } from "../formatters/html-formatter.js";
+export { formatAsSarif, formatMultipleAsSarif } from "../formatters/sarif-formatter.js";
 export { diffManifests } from "./differ.js";
 export { applyFixes } from "./fixer.js";
 export { formatDiff } from "../formatters/diff-formatter.js";

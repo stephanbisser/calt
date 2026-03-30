@@ -297,7 +297,7 @@ export const DEFAULT_CONFIG: AgentLensConfig = {
 
 // ─── Report Format Types ────────────────────────────────────────────────────
 
-export type ReportFormat = "terminal" | "json" | "markdown" | "html";
+export type ReportFormat = "terminal" | "json" | "markdown" | "html" | "sarif";
 
 // ─── Diff Report Types ──────────────────────────────────────────────────────
 

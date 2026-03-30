@@ -92,6 +92,7 @@ calt scan ./declarativeAgent.json              # Scan a local manifest
 calt scan ./my-agent-project                   # Scan a project folder
 calt scan                                      # Scan current directory
 calt scan --format json                        # JSON output (for CI/CD)
+calt scan --format sarif                       # SARIF output (for GitHub Code Scanning)
 calt scan --verbose                            # Show all passed checks
 calt scan --fix ./declarativeAgent.json        # Auto-fix issues
 calt scan --remote --all                       # Scan all tenant agents
@@ -167,8 +168,18 @@ calt init --template basic --output agents/my-agent.json
 ```bash
 calt report ./declarativeAgent.json --format json
 calt report ./declarativeAgent.json --format markdown
+calt report ./declarativeAgent.json --format sarif
 calt report ./declarativeAgent.json --format html --output report.html
 calt report --remote --all --format markdown
+```
+
+### Watch — re-scan on file changes
+
+```bash
+calt watch ./declarativeAgent.json             # Watch and re-scan on changes
+calt watch ./my-agent-project                  # Watch a project directory
+calt watch --format json                       # Watch with JSON output
+calt watch --verbose                           # Watch with detailed output
 ```
 
 ### Exit Codes
@@ -334,13 +345,33 @@ CALT exits with code `1` when errors are found, making it usable as a CI gate:
   run: npx calt-cli scan ./agents/ --format json
 ```
 
+### SARIF Integration
+
+Generate SARIF output for integration with GitHub Code Scanning, Azure DevOps, or VS Code:
+
+```bash
+calt scan ./agent.json --format sarif > results.sarif
+```
+
+Upload to GitHub Code Scanning via the `github/codeql-action/upload-sarif` action:
+
+```yaml
+- name: Scan Copilot Agent
+  run: npx calt-cli scan ./agents/ --format sarif > results.sarif
+  continue-on-error: true
+- name: Upload SARIF
+  uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: results.sarif
+```
+
 ## Project Structure
 
 ```
 calt/
 ├── src/
 │   ├── index.ts                    # CLI entry point (commander)
-│   ├── commands/                   # scan, lint, validate, fix, diff, fetch, login, init, setup, report
+│   ├── commands/                   # scan, lint, validate, fix, diff, fetch, login, init, setup, report, watch
 │   ├── core/
 │   │   ├── types.ts                # All TypeScript interfaces
 │   │   ├── index.ts                # Public API (for VS Code extension reuse)
@@ -363,7 +394,7 @@ calt/
 │   │   ├── actions/                # Plugin file checks
 │   │   ├── conversation-starters/  # Starter validation
 │   │   └── security/               # OWASP LLM Top 10 rules
-│   ├── formatters/                 # terminal (chalk), json, markdown, html
+│   ├── formatters/                 # terminal (chalk), json, markdown, html, sarif
 │   └── utils/                      # URL validator, Markdown parser
 ├── schemas/
 │   └── config.schema.json          # JSON Schema for .caltrc.json
@@ -427,6 +458,7 @@ import {
   formatAsJson,
   formatAsMarkdown,
   formatAsHtml,
+  formatAsSarif,
   detectProject,
 } from "calt-cli";
 ```

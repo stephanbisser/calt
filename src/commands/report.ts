@@ -5,6 +5,7 @@ import { runFullScan } from "../rules/rule-engine.js";
 import { formatAsJson, formatMultipleAsJson } from "../formatters/json-formatter.js";
 import { formatAsMarkdown, formatMultipleAsMarkdown } from "../formatters/markdown-formatter.js";
 import { formatAsHtml } from "../formatters/html-formatter.js";
+import { formatAsSarif, formatMultipleAsSarif } from "../formatters/sarif-formatter.js";
 import { resolveAgents, type RemoteOptions } from "./shared/resolve-agents.js";
 import type { ReportFormat, ScanReport } from "../core/types.js";
 
@@ -44,6 +45,8 @@ function formatReports(reports: ScanReport[], format: ReportFormat): string {
         return formatAsMarkdown(reports[0]);
       case "html":
         return formatAsHtml(reports[0]);
+      case "sarif":
+        return formatAsSarif(reports[0]);
       default:
         return formatAsJson(reports[0]);
     }
@@ -57,6 +60,8 @@ function formatReports(reports: ScanReport[], format: ReportFormat): string {
     case "html":
       // For multiple reports, concatenate HTML
       return reports.map((r) => formatAsHtml(r)).join("\n\n");
+    case "sarif":
+      return formatMultipleAsSarif(reports);
     default:
       return formatMultipleAsJson(reports);
   }
