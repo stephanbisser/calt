@@ -163,6 +163,14 @@ calt report ./declarativeAgent.json --format html --output report.html
 calt report --remote --all --format markdown
 ```
 
+### Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| `0`  | All checks passed successfully |
+| `1`  | Lint or validation errors found in agent configuration |
+| `2`  | CLI error (network failure, file not found, invalid arguments) |
+
 ## Configuration
 
 Run `calt init` to create a `.caltrc.json`:

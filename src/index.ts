@@ -14,21 +14,43 @@ import { setupCommand } from "./commands/setup.js";
 import { diffCommand } from "./commands/diff.js";
 import { fixCommand } from "./commands/fix.js";
 import { initCommand } from "./commands/init.js";
+import { setQuiet } from "./utils/logger.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function withErrorHandler(fn: (...args: any[]) => Promise<void | number>) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return async (...args: any[]) => {
-    try {
-      const code = await fn(...args);
-      if (typeof code === "number" && code !== 0) process.exit(code);
-    } catch (err) {
-      console.error(
-        chalk.red(`\n✗ ${err instanceof Error ? err.message : String(err)}\n`),
-      );
-      process.exit(1);
+    if (program.opts().quiet) {
+      setQuiet(true);
+      const originalLog = console.log;
+      const originalWarn = console.warn;
+      console.log = () => {};
+      console.warn = () => {};
+      try {
+        return await runWithErrorHandler(fn, args);
+      } finally {
+        console.log = originalLog;
+        console.warn = originalWarn;
+      }
     }
+    return runWithErrorHandler(fn, args);
   };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function runWithErrorHandler(fn: (...args: any[]) => Promise<void | number>, args: any[]) {
+  try {
+    const code = await fn(...args);
+    if (typeof code === "number" && code !== 0) process.exit(code);
+  } catch (err) {
+    const exitCode = (err instanceof Error && "exitCode" in err && typeof err.exitCode === "number")
+      ? err.exitCode
+      : 2;
+    console.error(
+      chalk.red(`\n✗ ${err instanceof Error ? err.message : String(err)}\n`),
+    );
+    process.exit(exitCode);
+  }
 }
 
 const require = createRequire(import.meta.url);
@@ -43,7 +65,8 @@ program
   .description(
     "CALT – Lint, validate, and analyze Microsoft 365 Copilot Agent configurations",
   )
-  .version(pkg.version);
+  .version(pkg.version)
+  .option("-q, --quiet", "Suppress all output except errors");
 
 // ─── Login / Logout ──────────────────────────────────────────────────────────
 
