@@ -1,6 +1,11 @@
 import chalk from "chalk";
 import { login, logout, getLoginStatus, acquireToken, decodeJwtPayload, type AuthConfig } from "../graph/auth.js";
 import { acquireDataverseToken, loginDataverse, getDataverseLoginStatus, type DataverseAuthConfig } from "../dataverse/auth.js";
+import {
+  acquirePowerPlatformTokenInteractive,
+  acquireBapTokenInteractive,
+  type PowerPlatformAuthConfig,
+} from "../powerplatform/auth.js";
 import { loadConfig, getDataverseOrgUrls } from "../core/config-loader.js";
 
 export async function loginCommand(options: {
@@ -65,6 +70,45 @@ export async function loginCommand(options: {
           console.log(chalk.gray("  Run 'calt setup --force' to reconfigure."));
         }
       }
+    }
+  }
+
+  // Pre-warm Power Platform tokens (PVA Service + BAP) so 'calt eval push'
+  // can run silently without further device-code prompts.
+  const ppConfig: PowerPlatformAuthConfig = {
+    clientId: authConfig.clientId,
+    tenantId: authConfig.tenantId,
+  };
+
+  try {
+    await acquirePowerPlatformTokenInteractive(ppConfig, (message) => {
+      console.log(chalk.yellow(`\n⚠ Power Virtual Agents Service requires one-time consent (for 'calt eval push').`));
+      console.log(chalk.yellow(message));
+      console.log("");
+    });
+    console.log(chalk.green("✓ Copilot Studio Eval API access verified"));
+  } catch (ppErr) {
+    const msg = ppErr instanceof Error ? ppErr.message : String(ppErr);
+    console.log(chalk.yellow(`⚠ Power Virtual Agents Service token could not be acquired.`));
+    if (msg.includes("AADSTS650057") || msg.includes("Invalid resource")) {
+      console.log(chalk.gray("  The PVA Service permission is not registered on your app."));
+      console.log(chalk.gray("  Run 'calt setup --force' to reconfigure."));
+    }
+  }
+
+  try {
+    await acquireBapTokenInteractive(ppConfig, (message) => {
+      console.log(chalk.yellow(`\n⚠ Power Platform BAP API requires one-time consent (for region discovery).`));
+      console.log(chalk.yellow(message));
+      console.log("");
+    });
+    console.log(chalk.green("✓ Power Platform BAP API access verified"));
+  } catch (bapErr) {
+    const msg = bapErr instanceof Error ? bapErr.message : String(bapErr);
+    console.log(chalk.yellow(`⚠ Power Platform BAP API token could not be acquired.`));
+    if (msg.includes("AADSTS650057") || msg.includes("Invalid resource")) {
+      console.log(chalk.gray("  The BAP API permission is not registered on your app."));
+      console.log(chalk.gray("  Run 'calt setup --force' to reconfigure."));
     }
   }
 

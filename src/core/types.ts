@@ -321,3 +321,31 @@ export interface DiffDetail {
   valueA?: string;
   valueB?: string;
 }
+
+// ─── Evaluation Test Set Types ─────────────────────────────────────────────
+
+export type EvalTestMethod =
+  | "General quality"
+  | "Compare meaning"
+  | "Similarity"
+  | "Exact match"
+  | "Keyword match";
+
+export interface EvalTestCase {
+  id?: string;
+  question: string;
+  expectedResponse?: string;
+  testingMethod: EvalTestMethod;
+}
+
+export interface EvalTestSuite {
+  name: string;
+  description?: string;
+  testCases: EvalTestCase[];
+}
+
+export interface EvalValidationResult {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+}

@@ -10,3 +10,7 @@ coverage/
 docs/
 .env*
 .claude/
+
+# Local eval state and HAR captures
+.calt/
+*.har

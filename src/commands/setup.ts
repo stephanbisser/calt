@@ -23,6 +23,16 @@ const DYNAMICS_CRM_APP_ID = "00000007-0000-0000-c000-000000000000";
 // Well-known GUID for user_impersonation scope on the Dynamics CRM service principal
 const DYNAMICS_USER_IMPERSONATION_GUID = "78ce3f0f-a1ce-49c2-8cde-64b5c0896db4";
 
+// Power Platform API first-party app (https://api.powerplatform.com)
+const POWER_PLATFORM_API_APP_ID = "8578e004-a5c6-46e7-913e-12f58912df43";
+// Power Apps Service first-party app (https://service.powerapps.com)
+// Required for the Copilot Studio Eval gateway (powervamg.*.gateway.prod.island.powerapps.com)
+const POWER_APPS_SERVICE_APP_ID = "475226c6-020e-4fb2-8a90-7a972cbfc1d4";
+const PVA_SERVICE_APP_ID = "96ff4394-9197-43aa-b393-6a41652e21f8";
+// Business Application Platform first-party app (https://api.bap.microsoft.com)
+// Required to discover the regional Power Apps gateway for an environment.
+const BAP_API_APP_ID = "0e0bf3cc-3078-4fd4-9ef3-cb6dc0245b10";
+
 // ─── Default config ─────────────────────────────────────────────────────────────
 
 const DEFAULT_CONFIG = {
@@ -247,6 +257,56 @@ async function addDynamicsCrmPermission(appId: string): Promise<void> {
   ]);
 }
 
+// ─── Power Platform API Permission ──────────────────────────────────
+
+async function getDelegatedScopes(spAppId: string): Promise<{ id: string; value: string }[]> {
+  try {
+    const raw = await runAz([
+      "ad", "sp", "show", "--id", spAppId,
+      "--query", "oauth2PermissionScopes[].{id:id,value:value}",
+      "-o", "json",
+    ]);
+    const parsed = JSON.parse(raw) as { id: string; value: string }[];
+    return parsed ?? [];
+  } catch {
+    return [];
+  }
+}
+
+async function addDelegatedPermission(
+  appId: string,
+  apiAppId: string,
+  apiName: string,
+): Promise<string[]> {
+  let scopes = await getDelegatedScopes(apiAppId);
+  if (scopes.length === 0) {
+    // Service principal not in tenant yet — try to create it (idempotent).
+    try {
+      await runAz(["ad", "sp", "create", "--id", apiAppId]);
+      scopes = await getDelegatedScopes(apiAppId);
+    } catch {
+      // fall through to error below
+    }
+  }
+  if (scopes.length === 0) {
+    throw new Error(
+      `${apiName} service principal not found in tenant. Run 'az ad sp create --id ${apiAppId}' once (requires Application Administrator) and retry.`,
+    );
+  }
+
+  const userImp = scopes.find((s) => s.value === "user_impersonation");
+  const chosen = userImp ? [userImp] : scopes;
+
+  const apiPerms = chosen.map((s) => `${s.id}=Scope`);
+  await runAz([
+    "ad", "app", "permission", "add",
+    "--id", appId,
+    "--api", apiAppId,
+    "--api-permissions", ...apiPerms,
+  ]);
+  return chosen.map((s) => s.value);
+}
+
 // ─── Config persistence ─────────────────────────────────────────────────────
 
 async function saveToConfig(clientId: string, tenantId: string, orgUrls?: string[]): Promise<void> {
@@ -360,6 +420,46 @@ export async function setupCommand(options: {
       }
     } catch {
       console.log(chalk.gray("  Could not list Power Platform environments — skipping Dataverse setup."));
+    }
+
+    // ─── Power Platform API permission (legacy / api.powerplatform.com) ───
+    console.log(chalk.gray("\nAdding Power Platform API permission..."));
+    try {
+      const added = await addDelegatedPermission(appId, POWER_PLATFORM_API_APP_ID, "Power Platform API");
+      console.log(chalk.green(`✓ Power Platform API permission added (${added.join(", ")})`));
+    } catch (ppErr) {
+      console.log(chalk.yellow(`⚠ Could not add Power Platform API permission: ${ppErr instanceof Error ? ppErr.message : String(ppErr)}`));
+      console.log(chalk.gray("  Add it manually: Azure Portal → App registrations → API permissions → Power Platform API → user_impersonation"));
+    }
+
+    // ─── Power Apps Service permission (for 'calt eval push') ─────────────
+    console.log(chalk.gray("\nAdding Power Apps Service permission (for 'calt eval push')..."));
+    try {
+      const added = await addDelegatedPermission(appId, POWER_APPS_SERVICE_APP_ID, "Power Apps Service");
+      console.log(chalk.green(`✓ Power Apps Service permission added (${added.join(", ")})`));
+    } catch (paErr) {
+      console.log(chalk.yellow(`⚠ Could not add Power Apps Service permission: ${paErr instanceof Error ? paErr.message : String(paErr)}`));
+      console.log(chalk.gray("  Add it manually: Azure Portal → App registrations → API permissions → Power Apps Service → User"));
+    }
+
+    // ─── BAP API permission (region discovery for 'calt eval push') ────────
+    console.log(chalk.gray("\nAdding Business Application Platform API permission (for region discovery)..."));
+    try {
+      const added = await addDelegatedPermission(appId, BAP_API_APP_ID, "Business Application Platform API");
+      console.log(chalk.green(`✓ BAP API permission added (${added.join(", ")})`));
+    } catch (bapErr) {
+      console.log(chalk.yellow(`⚠ Could not add BAP API permission: ${bapErr instanceof Error ? bapErr.message : String(bapErr)}`));
+      console.log(chalk.gray("  Add it manually, or pass --gateway-host to 'calt eval push'."));
+    }
+
+    // ─── Power Virtual Agents Service permission (real audience for eval API) ─
+    console.log(chalk.gray("\nAdding Power Virtual Agents Service permission (for 'calt eval push')..."));
+    try {
+      const added = await addDelegatedPermission(appId, PVA_SERVICE_APP_ID, "Power Virtual Agents Service");
+      console.log(chalk.green(`✓ PVA Service permission added (${added.join(", ")})`));
+    } catch (pvaErr) {
+      console.log(chalk.yellow(`⚠ Could not add PVA Service permission: ${pvaErr instanceof Error ? pvaErr.message : String(pvaErr)}`));
+      console.log(chalk.gray("  Add it manually: Azure Portal → API permissions → APIs my org uses → Power Virtual Agents Service → User"));
     }
 
     // ─── Admin consent (makes single-login work for all resources) ─────────
