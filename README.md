@@ -182,6 +182,57 @@ calt watch --format json                       # Watch with JSON output
 calt watch --verbose                           # Watch with detailed output
 ```
 
+### Eval — Copilot Studio evaluation test cases
+
+Manage Copilot Studio agent **evaluation test sets** as code: author them locally as YAML/JSON, push them straight to Copilot Studio, trigger eval runs, and stream results to the CLI.
+
+> **Experimental:** `calt eval push` and `calt eval run` use **undocumented Copilot Studio APIs** (discovered via the Copilot Studio web client). They require the `--experimental-direct-api` flag and may break without notice. The local commands (`init`, `validate`, `export`, `import`) are stable.
+
+**Auth:** A single `calt login` is enough — CALT pre-warms Graph, Dataverse, Power Platform (PVA) and BAP tokens in one device-code flow. Your Entra app must have **Power Virtual Agents Service** (`user_impersonation`) added; `calt setup` adds it automatically.
+
+```bash
+# 1. Author a test suite locally (creates .calt/evals/sample.eval.yaml)
+calt eval init
+
+# 2. Validate schema and field lengths
+calt eval validate ./.calt/evals/sample.eval.yaml
+
+# 3a. Local CSV export (works with the Copilot Studio import UI)
+calt eval export ./.calt/evals/sample.eval.yaml --output ./out/testset.csv
+
+# 3b. Direct push to Copilot Studio (experimental)
+calt eval push ./.calt/evals/sample.eval.yaml \
+  --bot-id <BOT_ID> --env-id <ENV_ID> \
+  --experimental-direct-api                   # dry-run by default
+calt eval push ./.calt/evals/sample.eval.yaml \
+  --bot-id <BOT_ID> --env-id <ENV_ID> \
+  --experimental-direct-api --apply           # actually create/update test cases
+calt eval push ./.calt/evals/sample.eval.yaml \
+  --bot-id <BOT_ID> --env-id <ENV_ID> \
+  --experimental-direct-api --apply --prune   # also delete remote-only cases
+
+# 4. Trigger an eval run and stream results
+calt eval run ./.calt/evals/sample.eval.yaml \
+  --bot-id <BOT_ID> --env-id <ENV_ID> \
+  --experimental-direct-api
+# → resolves test set by suite name, reuses last run's mcsConnectionId,
+#   polls until Completed/Failed/Cancelled and prints PASS/FAIL per test case
+```
+
+**Suite file format** (YAML or JSON):
+
+```yaml
+name: Weather Agent – Core Scenarios
+description: Smoke tests for the weather info agent
+testCases:
+  - id: TC-001
+    question: What's the weather in Vienna right now?
+    expectedResponse: Provides current temperature, conditions and wind for Vienna.
+    testingMethod: General quality       # or "Compare meaning" | "Similarity"
+```
+
+The regional PowerVA gateway host is auto-discovered via BAP; override with `--gateway-host` if needed. Use `--test-set-id`, `--mcs-connection-id`, `--run-name`, `--poll-ms`, `--timeout-ms` to override defaults.
+
 ### Exit Codes
 
 | Code | Meaning |
