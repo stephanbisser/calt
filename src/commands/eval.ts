@@ -602,7 +602,7 @@ export async function evalRunCommand(
   let runId: string;
   try {
     const created = await client.startRun({ testSetId, runName, mcsConnectionId });
-    runId = created.id;
+    runId = created.runId;
     console.log(chalk.green(`\n✓ Started eval run "${runName}"`));
     console.log(chalk.gray(`  runId: ${runId}`));
   } catch (err) {

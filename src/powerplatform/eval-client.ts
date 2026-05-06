@@ -391,13 +391,13 @@ export class CopilotStudioEvalClient {
     testSetId: string;
     runName: string;
     mcsConnectionId?: string;
-  }): Promise<RunSummary> {
+  }): Promise<{ runId: string; state: string }> {
     const body: Record<string, unknown> = {
       testSetId: args.testSetId,
       clientRequestedEvaluationRunName: args.runName,
     };
     if (args.mcsConnectionId) body.mcsConnectionId = args.mcsConnectionId;
-    return this.req<RunSummary>("POST", "", body);
+    return this.req<{ runId: string; state: string }>("POST", "", body);
   }
 
   async getRunDetails(runId: string): Promise<RunDetails> {
