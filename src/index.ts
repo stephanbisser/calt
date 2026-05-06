@@ -14,6 +14,13 @@ import { setupCommand } from "./commands/setup.js";
 import { diffCommand } from "./commands/diff.js";
 import { fixCommand } from "./commands/fix.js";
 import { initCommand } from "./commands/init.js";
+import {
+  evalInitCommand,
+  evalValidateCommand,
+  evalExportCommand,
+  evalImportCommand,
+  evalPushCommand,
+} from "./commands/eval.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function withErrorHandler(fn: (...args: any[]) => Promise<void | number>) {
@@ -241,6 +248,66 @@ program
   .option("--dry-run", "Show what would change without modifying files")
   .action(withErrorHandler(async (path, options) => {
     await fixCommand(path, options);
+  }));
+
+// ─── Eval ───────────────────────────────────────────────────────────────────
+
+const evalProgram = program
+  .command("eval")
+  .description("Manage Copilot Studio evaluation test cases for import");
+
+evalProgram
+  .command("init")
+  .description("Create a local eval test suite template")
+  .option("--output <path>", "Path for template file (.yaml or .json)")
+  .option("--force", "Overwrite existing file")
+  .action(withErrorHandler(async (options) => {
+    await evalInitCommand(options);
+  }));
+
+evalProgram
+  .command("validate")
+  .argument("<file>", "Path to eval suite file (.yaml or .json)")
+  .description("Validate local eval suite file")
+  .action(withErrorHandler(async (file) => {
+    return evalValidateCommand(file);
+  }));
+
+evalProgram
+  .command("export")
+  .argument("<file>", "Path to eval suite file (.yaml or .json)")
+  .description("Export eval suite to Copilot Studio CSV import format")
+  .option("--output <path>", "Output CSV file path")
+  .action(withErrorHandler(async (file, options) => {
+    return evalExportCommand(file, options);
+  }));
+
+evalProgram
+  .command("import")
+  .argument("<file>", "Path to eval suite file (.yaml or .json)")
+  .description("Prepare Copilot Studio import CSV from local eval suite")
+  .option("--output <path>", "Output CSV file path")
+  .action(withErrorHandler(async (file, options) => {
+    return evalImportCommand(file, options);
+  }));
+
+evalProgram
+  .command("push")
+  .argument("<file>", "Path to eval suite file (.yaml or .json)")
+  .description("Push eval test cases directly to a Copilot Studio bot (experimental)")
+  .option("--bot-id <id>", "Copilot Studio bot/agent ID (GUID)")
+  .option("--env-id <id>", "Power Platform environment ID (GUID)")
+  .option("--test-set-id <id>", "Existing test set ID to update")
+  .option("--apply", "Actually send changes (default is dry-run)")
+  .option("--prune", "Delete remote test cases not present locally")
+  .option("--experimental-direct-api", "Required to use undocumented Copilot Studio write APIs")
+  .option("--snapshot-dir <path>", "Directory to store remote-state snapshots")
+  .option("--config <path>", "Path to .caltrc.json")
+  .option("--client-id <id>", "Custom Entra App client ID")
+  .option("--tenant <tenant-id>", "Specific tenant ID")
+  .option("--gateway-host <host>", "PowerVA regional gateway host (e.g. powervamg.us-il301.gateway.prod.island.powerapps.com); auto-discovered via BAP if omitted")
+  .action(withErrorHandler(async (file, options) => {
+    return evalPushCommand(file, options);
   }));
 
 program.parse();

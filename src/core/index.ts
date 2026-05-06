@@ -21,6 +21,10 @@ export type {
   DiffReport,
   DiffSection,
   DiffDetail,
+  EvalTestMethod,
+  EvalTestCase,
+  EvalTestSuite,
+  EvalValidationResult,
 } from "./types.js";
 
 export { DEFAULT_CONFIG, BotComponentType } from "./types.js";
@@ -37,3 +41,10 @@ export { applyFixes } from "./fixer.js";
 export { formatDiff } from "../formatters/diff-formatter.js";
 export { formatDiffAsJson } from "../formatters/json-formatter.js";
 export { formatDiffAsMarkdown } from "../formatters/markdown-formatter.js";
+export {
+  loadEvalSuite,
+  validateEvalSuite,
+  toCopilotImportCsv,
+  saveCopilotImportCsv,
+  writeEvalTemplate,
+} from "./eval.js";
