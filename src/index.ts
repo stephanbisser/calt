@@ -20,6 +20,7 @@ import {
   evalExportCommand,
   evalImportCommand,
   evalPushCommand,
+  evalRunCommand,
 } from "./commands/eval.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -308,6 +309,26 @@ evalProgram
   .option("--gateway-host <host>", "PowerVA regional gateway host (e.g. powervamg.us-il301.gateway.prod.island.powerapps.com); auto-discovered via BAP if omitted")
   .action(withErrorHandler(async (file, options) => {
     return evalPushCommand(file, options);
+  }));
+
+evalProgram
+  .command("run")
+  .argument("<file>", "Path to eval suite file (.yaml or .json)")
+  .description("Trigger a Copilot Studio eval run and stream results to the CLI (experimental)")
+  .option("--bot-id <id>", "Copilot Studio bot/agent ID (GUID)")
+  .option("--env-id <id>", "Power Platform environment ID (GUID)")
+  .option("--test-set-id <id>", "Existing test set ID (defaults to lookup by suite name)")
+  .option("--mcs-connection-id <id>", "Copilot Studio connection id (defaults to last run's value)")
+  .option("--run-name <name>", "Custom run name (defaults to '<test-set> <timestamp>')")
+  .option("--poll-ms <n>", "Polling interval in milliseconds", (v) => parseInt(v, 10))
+  .option("--timeout-ms <n>", "Maximum wait time in milliseconds", (v) => parseInt(v, 10))
+  .option("--experimental-direct-api", "Required to use undocumented Copilot Studio APIs")
+  .option("--config <path>", "Path to .caltrc.json")
+  .option("--client-id <id>", "Custom Entra App client ID")
+  .option("--tenant <tenant-id>", "Specific tenant ID")
+  .option("--gateway-host <host>", "PowerVA regional gateway host; auto-discovered via BAP if omitted")
+  .action(withErrorHandler(async (file, options) => {
+    return evalRunCommand(file, options);
   }));
 
 program.parse();

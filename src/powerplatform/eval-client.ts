@@ -379,4 +379,87 @@ export class CopilotStudioEvalClient {
     };
     await this.req<UpdateResponse>("POST", "/testcomponent", payload);
   }
+
+  // ─── Eval runs ──────────────────────────────────────────────────────────
+
+  async listRuns(): Promise<RunSummary[]> {
+    const data = await this.req<RunSummary[]>("GET", "?count=100");
+    return Array.isArray(data) ? data : [];
+  }
+
+  async startRun(args: {
+    testSetId: string;
+    runName: string;
+    mcsConnectionId?: string;
+  }): Promise<RunSummary> {
+    const body: Record<string, unknown> = {
+      testSetId: args.testSetId,
+      clientRequestedEvaluationRunName: args.runName,
+    };
+    if (args.mcsConnectionId) body.mcsConnectionId = args.mcsConnectionId;
+    return this.req<RunSummary>("POST", "", body);
+  }
+
+  async getRunDetails(runId: string): Promise<RunDetails> {
+    return this.req<RunDetails>(
+      "GET",
+      `/${encodeURIComponent(runId)}/details`,
+    );
+  }
+}
+
+export interface RunSummary {
+  id: string;
+  name: string;
+  state: string;
+  testSetId: string;
+  mcsConnectionId?: string;
+  startTime?: string;
+  TotalItemCount?: number;
+  ProcessedItemCount?: number;
+}
+
+export interface RunDetails {
+  id: string;
+  name: string;
+  state: string;
+  testCaseCount: number;
+  startTime?: string;
+  endTime?: string;
+  aggregatedGraderResults?: Array<{
+    name: string;
+    count: number;
+    graderId?: string;
+  }>;
+  details?: {
+    testCases?: RunTestCaseResult[];
+  };
+}
+
+export interface RunTestCaseResult {
+  id: string;
+  testCaseComponentId: string;
+  executionState: string;
+  conversationId?: string;
+  queries?: Array<{
+    query: string;
+    answer: string;
+    answerType?: string;
+    metrics?: {
+      queryResponseMetrics?: Array<{
+        metricType?: string;
+        evaluationResult?: string;
+        graderResult?: { graderResult?: string };
+        properties?: Record<string, string>;
+      }>;
+    };
+  }>;
+  dataFields?: { fields?: Record<string, string> };
+  graderMetrics?: {
+    queryResponseMetrics?: Array<{
+      evaluationResult?: string;
+      graderResult?: { graderResult?: string };
+      properties?: Record<string, string>;
+    }>;
+  };
 }
