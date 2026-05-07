@@ -31,7 +31,7 @@ export { DEFAULT_CONFIG, BotComponentType } from "./types.js";
 export { loadConfig, getDataverseOrgUrls } from "./config-loader.js";
 export { parseFileReference, loadFromFile, loadFromRemote, loadAllFromRemote, listRemoteAgents, loadFromDataverse, loadAllFromDataverse, listDataverseBots, listDataverseBotsAllEnvs, loadAllFromDataverseAllEnvs, loadFromDataverseAnyEnv } from "./manifest-loader.js";
 export { detectProject } from "./project-detector.js";
-export { runFullScan, runInstructionLint, runSchemaValidation } from "../rules/rule-engine.js";
+export { runFullScan, runInstructionLint, runSchemaValidation, ALL_RULES } from "../rules/rule-engine.js";
 export { formatScanReport, formatLintReport, formatAgentTable } from "../formatters/terminal-formatter.js";
 export { formatAsJson } from "../formatters/json-formatter.js";
 export { formatAsMarkdown } from "../formatters/markdown-formatter.js";

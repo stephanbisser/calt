@@ -30,7 +30,7 @@ import { groundingRules } from "./security/grounding-rules.js";
 import { complexityRules } from "./instructions/complexity-rules.js";
 import { alignmentRules } from "./instructions/alignment-rules.js";
 
-const ALL_RULES: Rule[] = [
+export const ALL_RULES: Rule[] = [
   ...schemaRules,
   ...lengthRules,
   ...structureRules,

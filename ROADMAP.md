@@ -12,9 +12,10 @@ CALT is evolving from a CLI linter into the **de-facto IDE-grade quality layer f
 Microsoft 365 Copilot Agents** — a layer that accompanies every agent from the first
 prompt draft in VS Code, through Copilot Studio maker flows, into CI/CD pipelines and
 tenant-wide CISO dashboards. The same deterministic rule engine is augmented by
-**AI-assisted auto-fixes**, a **Copilot Chat participant `@calt`**, and an **MCP server**
-so that Claude Desktop, Claude Code, Cursor, and any LLM client can invoke exactly the
-same operations as the VS Code frontend.
+**AI-assisted auto-fixes** and a **Copilot Chat participant `@calt`**. For coding agents
+(Claude Code, Cursor, etc.) the CLI plus a single [`AGENTS.md`](AGENTS.md) contract is
+the integration surface — no MCP server in between, because shell access plus
+`--format json` is faster, cheaper in context-window, and zero state.
 
 **One source of truth (`packages/core`) — many frontends, one quality bar.**
 
@@ -30,19 +31,23 @@ calt/
 │   ├── core/                # current src/ — pure TS, deterministic
 │   │                        # exports runFullScan, applyFixes, loaders, formatters
 │   ├── cli/                 # current bin: commander → calls @calt/core
-│   ├── vscode/              # NEW: VS Code extension (vsce bundle)
-│   ├── mcp/                 # NEW: MCP server (stdio + http)
-│   ├── chat/                # NEW: Copilot Chat participant (may live in vscode/)
-│   ├── shared-prompts/      # NEW: AI prompt templates for Fix/Rewrite/Generate
+│   ├── vscode/              # VS Code extension (vsce bundle)
+│   ├── chat/                # Copilot Chat participant (may live in vscode/)
+│   ├── shared-prompts/      # AI prompt templates for Fix/Rewrite/Generate
 │   └── eslint-plugin-calt/  # OPTIONAL
+├── AGENTS.md                # contract for coding agents (Claude Code, Cursor, …)
 └── action.yml               # stays at root for GitHub Actions
+
+# Note: no packages/mcp — see §3 Category B for why.
 ```
 
 ### Data Flow
 
 ```
    ┌────────────── User Surfaces ──────────────┐
-   │ VS Code UI │ Chat (@calt) │ MCP Clients   │
+   │ VS Code UI │ Chat (@calt) │ Coding Agents │
+   │            │              │ (via CLI +    │
+   │            │              │  AGENTS.md)   │
    └─────┬──────┴──────┬───────┴──────┬────────┘
          ▼             ▼              ▼
         ┌───────────────────────────────┐
@@ -55,9 +60,11 @@ calt/
                         (MSAL Device Code, token cache)
 ```
 
-All three new frontends import exclusively from `@calt/core`. **No logic is duplicated.**
-The fixer gains an `aiFix(ruleResult, manifestText, lmClient)` hook that uses `vscode.lm`
-or MCP sampling when needed — otherwise the existing deterministic `applyFixes` runs.
+VS Code and the chat participant import directly from `@calt/core`. Coding agents
+talk to CALT through the public CLI surface — `calt scan/lint/fix/rules
+--format json` — guided by [`AGENTS.md`](AGENTS.md). **No logic is duplicated.**
+The fixer gains an `aiFix(ruleResult, manifestText, lmClient)` hook that uses
+`vscode.lm` when needed; otherwise the existing deterministic `applyFixes` runs.
 
 ---
 
@@ -78,18 +85,28 @@ or MCP sampling when needed — otherwise the existing deterministic `applyFixes
 | A9 | **Diff View Integration for Fixes** | Pro-Code | Before `applyFixes` writes: native VS Code diff shows before/after; user accepts/rejects per hunk. Also for `calt diff` remote-vs-local. | `applyFixes`, `diffManifests`, `formatDiff` | `vscode.diff` command, `TextDocumentContentProvider` | M |
 | A10 | **Rule Documentation Browser** | All | Activity-bar icon: searchable catalog of all 35+ rules. Filter by category, severity, OWASP. "Open in `.caltrc`" patches directly. | rule metadata | `Webview` or `TreeView` | S |
 
-### Category B — AI / Copilot Chat / MCP (8 ideas)
+### Category B — AI / Copilot Chat / Coding-Agent CLI (8 ideas)
+
+> **B2 (MCP Server) was dropped after evaluation.** For coding agents the CLI
+> with stable `--format json` and an [`AGENTS.md`](AGENTS.md) contract beats an
+> MCP server on every axis: tool descriptions in MCP burn context-window
+> tokens on every turn (even when CALT isn't used), while shell calls only
+> cost tokens at invocation. CALT is also fully stateless and file-based —
+> the exact shape MCP isn't optimised for. A thin MCP wrapper shelling out to
+> the CLI remains an option for non-shell clients (Claude Desktop chat,
+> Continue, …) if there's user demand.
 
 | # | Title | Persona | What it does | Reuses | APIs | Effort |
 |---|---|---|---|---|---|---|
 | B1 | **Copilot Chat Participant `@calt`** | All | Slash commands: `/scan`, `/fix [ruleId]`, `/explain <ruleId>`, `/improve-instruction`, `/generate-starters`, `/diff <packageId>`, `/audit <tenant>`. Streaming markdown + executable buttons. | full public API | `chatParticipant`, `ChatRequestHandler`, `chat.followups` | L |
-| B2 | **MCP Server (`@calt/mcp`)** | All / power users | Stdio + HTTP. Tools: `calt.scan`, `calt.lint`, `calt.fix`, `calt.fetch`, `calt.diff`, `calt.eval.generate`. Resources: `agent://tenant/{packageId}`, `caltrc://workspace`. Token cache shared. | all loaders & `runFullScan`, `applyFixes` | MCP SDK | L |
+| ~~B2~~ | ~~**MCP Server (`@calt/mcp`)**~~ | ~~All / power users~~ | **DROPPED.** Coding agents (Claude Code, Cursor, etc.) already have shell access — the CLI + `--format json` is faster, cheaper in context-window, and stateless. MCP would only add ~1 KB of tool descriptions to every turn for no functional gain. The CLI is the agent contract; see [AGENTS.md](AGENTS.md). A thin MCP wrapper that shells out to the CLI may be reconsidered later if Claude Desktop / Continue users (no Bash) request it. | — | — | — |
 | B3 | **AI Auto-Fix via `vscode.lm`** | Pro-Code | When `FixDescriptor` is missing (e.g. INST-LANG-001), a second quick-fix "Fix with Copilot": prompt from rule ID + snippet + OWASP context, sends to `lm.selectChatModels`, validates output by running `runFullScan` again (loop until pass). | `runFullScan` as validator | `lm.selectChatModels` | L |
 | B4 | **AI Instruction Rewrite Wizard** | Maker, Pro-Code | On multiple INST-* findings: webview shows original/AI proposal side-by-side with rationale per change. Constraints: `instruction_ideal_range`, Flesch-Kincaid, capability alignment. | `runInstructionLint`, complexity rules | `lm`, `Webview` | L |
 | B5 | **AI Conversation-Starter Generator** | Maker | When `require_conversation_starters_min` is short: `/generate-starters` produces N context-aware starters from `name + description + instructions`. Writes back, re-validates. | manifest types, `runFullScan` | `lm`, `WorkspaceEdit` | M |
 | B6 | **Prompt-Injection Explainer** | CISO, Pro-Code | On SEC-PI-* / SEC-LEAK-* findings: hover action "Why is this risky?" — AI explains OWASP LLM01/LLM07 for this exact finding, suggests guardrail boilerplate (deterministic `append-section` fallback). | `security/prompt-injection-rules.ts` | `lm`, `HoverProvider` | M |
 | B7 | **Natural Language → Manifest Scaffolding** | Maker | Command "CALT: Generate Agent from Description". User types "HR onboarding agent for new hires with SharePoint knowledge". AI emits a complete v1.6 manifest, validated against schema + rules, iterating until 0 errors. | schemas v1.6, `runSchemaValidation` | `lm`, `InputBox` | L |
 | B8 | **Eval Suite Generator from description** | Pro-Code, CISO | From `description + instructions + capabilities` AI generates an `EvalTestSuite` (10–50 cases) mixing "Compare meaning" / "Keyword match" / adversarial prompts (injection tests). Export as CSV via `toCopilotImportCsv`. | `eval.ts`, `EvalTestSuite`, `saveCopilotImportCsv` | `lm` | M |
+| B9 | **Coding-Agent CLI surface** (replaces B2) | Pro-Code | `calt rules --format json` for rule-catalog discovery, frozen JSON schemas for `scan/lint/fix --format json`, contractual exit codes, and an [`AGENTS.md`](AGENTS.md) at repo root that tells coding agents when/how to invoke CALT. Zero token-window cost when CALT isn't used. | `ALL_RULES` from rule engine, existing `--format json` formatters | — | S |
 
 ### Category C — M365 Agents Toolkit Touchpoints (4 ideas)
 
@@ -134,7 +151,7 @@ or MCP sampling when needed — otherwise the existing deterministic `applyFixes
 | Phase | Timeline | Content | Why now |
 |---|---|---|---|
 | **Phase 1 — Foundation** | 0–3 mo | Monorepo split (`packages/core`, `cli`, `vscode`), A1, A2, A3, A6, A7, A8, C2, C3, C4, E1, E2 | Brings CALT into IDE — fastest time-to-value, primary persona Pro-Code |
-| **Phase 2 — AI** | 3–6 mo | A4, A5, A9, A10, B1 (`@calt`), B2 (MCP), B3, B5, B6, D3 | Differentiates from plain linters; LM API & MCP market are mature |
+| **Phase 2 — AI** | 3–6 mo | A4, A5, A9, A10, B1 (`@calt`), B3, B5, B6, D3, **agent-friendly CLI** (`calt rules --json`, AGENTS.md, stable JSON schemas) | Differentiates from plain linters; LM API is mature; coding agents standardize on shell tools, so we invest there instead of MCP |
 | **Phase 3 — Enterprise** | 6–9 mo | B4, B7, B8, C1, D1, D2, E3, E4, E5 | Activates CISO/maker-lead persona, tenant scale |
 | **Phase 4 — Moonshot** | 9–18 mo | F1, F2, F3, F4 | Requires adoption from phases 1–3 |
 

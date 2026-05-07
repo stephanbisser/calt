@@ -6,11 +6,12 @@ import type { LoadedAgent, RuleResult, ScanReport } from "calt-cli";
 const COMMAND_ID = "calt.fixWithCopilot";
 
 /**
- * Rule prefixes for which an AI-driven instruction rewrite is meaningful.
- * Schema/actions/starters rules have deterministic fixes already, or need
- * structural changes that a freeform LM call can't reliably produce.
+ * Rules for which an AI-driven instruction rewrite is meaningful: any rule
+ * whose remediation is text-level changes to the agent's `instructions`
+ * field. Schema/action/starter rules need structural changes that a freeform
+ * LM call can't reliably produce, so they're excluded.
  */
-const AI_RULE_PREFIXES = ["INST-", "SEC-PI-", "SEC-LEAK-", "SEC-INFO-", "SEC-AGENCY-", "SEC-GROUND-"];
+const AI_RULE_PREFIXES = ["INST-", "SEC-"];
 
 export function isAiFixable(result: RuleResult): boolean {
   if (result.passed) return false;

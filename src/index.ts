@@ -14,6 +14,7 @@ import { setupCommand } from "./commands/setup.js";
 import { diffCommand } from "./commands/diff.js";
 import { fixCommand } from "./commands/fix.js";
 import { initCommand } from "./commands/init.js";
+import { rulesCommand } from "./commands/rules.js";
 import { watchCommand } from "./commands/watch.js";
 import { setQuiet } from "./utils/logger.js";
 import {
@@ -275,6 +276,29 @@ program
   .option("--dry-run", "Show what would change without modifying files")
   .action(withErrorHandler(async (path, options) => {
     await fixCommand(path, options);
+  }));
+
+// ─── Rules ──────────────────────────────────────────────────────────────────
+
+program
+  .command("rules")
+  .description("List all CALT rules with their default and effective severities")
+  .option("--config <path>", "Path to .caltrc.json (overrides take effect in 'effectiveSeverity')")
+  .addOption(
+    new Option("--format <type>", "Output format")
+      .choices(["terminal", "json"])
+      .default("terminal"),
+  )
+  .addOption(
+    new Option("--category <name>", "Filter by category")
+      .choices(["schema", "instructions", "knowledge", "actions", "conversation-starters", "security"]),
+  )
+  .addOption(
+    new Option("--severity <level>", "Filter by effective severity")
+      .choices(["error", "warning", "info", "off"]),
+  )
+  .action(withErrorHandler(async (options) => {
+    await rulesCommand(options);
   }));
 
 // ─── Watch ──────────────────────────────────────────────────────────────────

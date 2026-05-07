@@ -17,10 +17,19 @@ calt scan ./declarativeAgent.json # 2. Scan — done!
 
 Working on agents inside VS Code? The [`calt-vscode` extension](packages/vscode/README.md)
 brings live diagnostics, schema-aware IntelliSense, quick-fixes, a status-bar
-health score, an init-config wizard, and a CI-workflow generator straight into
-the editor — with auto-detection for Microsoft 365 Agents Toolkit projects.
-See [ROADMAP.md](ROADMAP.md) for the longer-term vision (AI auto-fixes,
-`@calt` Copilot Chat participant, MCP server, tenant governance dashboards).
+health score, an init-config wizard, a CI-workflow generator, the `@calt`
+Copilot Chat participant, and AI auto-fixes via `vscode.lm` straight into the
+editor — with auto-detection for Microsoft 365 Agents Toolkit projects.
+See [ROADMAP.md](ROADMAP.md) for the longer-term vision.
+
+## Using CALT from a coding agent (Claude Code, Cursor, …)
+
+CALT is designed to be driven by AI coding agents through its CLI — no MCP
+server needed. If you're using one in this repo, point it at
+[`AGENTS.md`](AGENTS.md): it explains when to invoke `calt scan / lint / fix
+/ rules`, what the `--format json` shapes look like, what exit codes mean,
+and how to apply fixes safely. Use `calt rules --format json` to discover
+rule IDs once at the start of a task instead of guessing them.
 
 ## Quick Start
 

@@ -21,7 +21,7 @@ class CaltHoverProvider implements vscode.HoverProvider {
       `[Re-scan](command:calt.scan)`,
     ];
 
-    if (ruleId && /^SEC-(PI|LEAK|INFO|AGENCY|GROUND|SUPPLY)-/.test(ruleId)) {
+    if (ruleId && /^SEC-/.test(ruleId)) {
       // B6: Prompt-Injection Explainer. Open the chat participant with a
       // pre-populated /explain command — the participant routes to its
       // SYSTEM_EXPLAIN prompt and uses LM if Copilot is available.

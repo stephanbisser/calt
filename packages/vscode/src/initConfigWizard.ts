@@ -137,22 +137,18 @@ function profileRules(profile: WizardState["profile"]): Record<string, string> {
   switch (profile) {
     case "strict":
       return {
-        "INST-LEN-001": "error",
-        "INST-LEN-002": "error",
-        "STR-001": "error",
-        "STR-002": "error",
+        // Promote a representative set of instruction & starter warnings to errors.
+        "INST-001": "error",
+        "INST-002": "error",
+        "CS-001": "error",
+        "CS-002": "error",
       };
     case "security-first":
-      return {
-        "SEC-PI-001": "error",
-        "SEC-PI-002": "error",
-        "SEC-PI-003": "error",
-        "SEC-LEAK-001": "error",
-        "SEC-LEAK-002": "error",
-        "SEC-INFO-001": "error",
-        "SEC-AGENCY-001": "error",
-        "SEC-SUPPLY-001": "error",
-      };
+      // Promote every OWASP-related security rule to error. Keys map to
+      // actual SEC-* rule IDs from the rule catalog (see `calt rules`).
+      return Object.fromEntries(
+        Array.from({ length: 15 }, (_, i) => [`SEC-${String(i + 1).padStart(3, "0")}`, "error"]),
+      );
     case "recommended":
     default:
       return {};
