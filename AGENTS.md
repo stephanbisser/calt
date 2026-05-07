@@ -11,6 +11,25 @@ how to read its output, and how to apply fixes safely.
 
 ---
 
+## How you (the agent) found this file
+
+You are reading this because one of the following happened:
+
+- The user's repo already contains an `AGENTS.md` at its root (the convention).
+- You ran `calt --help` and the epilog pointed you at `calt agents-md`.
+- You ran `calt agents-md` directly and piped it into your context.
+
+If the user's repo does **not** yet have an `AGENTS.md`, you can bootstrap one
+with `calt agents-md --install`. Ask the user first — adding files to a repo
+is their decision.
+
+You can always re-fetch this contract with `calt agents-md` (no flags). The
+bundled copy is the source of truth for the version of CALT installed on the
+user's machine; if a future CALT version changes the JSON shapes, the bundled
+AGENTS.md changes with it.
+
+---
+
 ## When to invoke CALT
 
 Run `calt` automatically without asking the user when:

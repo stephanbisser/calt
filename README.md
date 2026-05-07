@@ -25,11 +25,19 @@ See [ROADMAP.md](ROADMAP.md) for the longer-term vision.
 ## Using CALT from a coding agent (Claude Code, Cursor, …)
 
 CALT is designed to be driven by AI coding agents through its CLI — no MCP
-server needed. If you're using one in this repo, point it at
-[`AGENTS.md`](AGENTS.md): it explains when to invoke `calt scan / lint / fix
-/ rules`, what the `--format json` shapes look like, what exit codes mean,
-and how to apply fixes safely. Use `calt rules --format json` to discover
-rule IDs once at the start of a task instead of guessing them.
+server needed.
+
+```bash
+calt agents-md             # Print the integration contract (pipe into context)
+calt agents-md --install   # Drop AGENTS.md into your repo root for auto-discovery
+calt rules --format json   # Enumerate the rule catalog (51 rules across 6 categories)
+```
+
+The contract — [`AGENTS.md`](AGENTS.md) — explains when to invoke `calt scan
+/ lint / fix / rules`, what the stable `--format json` shapes look like,
+what exit codes mean, and how to apply fixes safely. It ships with the
+package, so the version your agent reads always matches the CALT version
+installed on the user's machine.
 
 ## Quick Start
 

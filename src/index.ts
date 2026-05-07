@@ -15,6 +15,7 @@ import { diffCommand } from "./commands/diff.js";
 import { fixCommand } from "./commands/fix.js";
 import { initCommand } from "./commands/init.js";
 import { rulesCommand } from "./commands/rules.js";
+import { agentsMdCommand } from "./commands/agents-md.js";
 import { watchCommand } from "./commands/watch.js";
 import { setQuiet } from "./utils/logger.js";
 import {
@@ -76,7 +77,18 @@ program
     "CALT – Lint, validate, and analyze Microsoft 365 Copilot Agent configurations",
   )
   .version(pkg.version)
-  .option("-q, --quiet", "Suppress all output except errors");
+  .option("-q, --quiet", "Suppress all output except errors")
+  .addHelpText(
+    "after",
+    `
+For AI coding agents (Claude Code, Cursor, Continue, …):
+  $ calt agents-md           Print the agent integration contract.
+  $ calt agents-md --install Drop AGENTS.md into the current repo so your
+                             coding agent picks it up automatically.
+  $ calt rules --format json Discover the rule catalog as JSON.
+
+See AGENTS.md for the stable JSON output shapes and exit-code semantics.`,
+  );
 
 // ─── Login / Logout ──────────────────────────────────────────────────────────
 
@@ -299,6 +311,19 @@ program
   )
   .action(withErrorHandler(async (options) => {
     await rulesCommand(options);
+  }));
+
+// ─── Agents (AI coding agent contract) ──────────────────────────────────────
+
+program
+  .command("agents-md")
+  .description("Print the AGENTS.md contract for AI coding agents (or install it into a project)")
+  .option("--install", "Write AGENTS.md into the current directory (or --output path)")
+  .option("--path", "Print the absolute path of the bundled AGENTS.md and exit")
+  .option("--output <path>", "When --install is set, write to this path instead of ./AGENTS.md")
+  .option("--force", "Overwrite existing AGENTS.md when --install is set")
+  .action(withErrorHandler(async (options) => {
+    await agentsMdCommand(options);
   }));
 
 // ─── Watch ──────────────────────────────────────────────────────────────────
