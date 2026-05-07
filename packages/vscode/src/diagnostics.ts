@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { rangeForCategory } from "./locator.js";
 import { getOutput } from "./output.js";
+import { rephraseForPersona } from "./persona.js";
 import type { ScanReport, RuleResult, Severity } from "calt-cli";
 
 export interface DiagnosticsState {
@@ -129,7 +130,7 @@ export function reportToDiagnostics(doc: vscode.TextDocument, report: ScanReport
     for (const r of cat.results) {
       if (r.passed) continue;
       const range = rangeFor(doc, cat.category, r);
-      const diag = new vscode.Diagnostic(range, r.message, severityFor(r.severity));
+      const diag = new vscode.Diagnostic(range, rephraseForPersona(r), severityFor(r.severity));
       diag.source = "CALT";
       diag.code = {
         value: r.ruleId,

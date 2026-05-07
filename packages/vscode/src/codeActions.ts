@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { buildAiFixAction, isAiFixable } from "./aiFix.js";
 
 class CaltCodeActionProvider implements vscode.CodeActionProvider {
   static readonly providedCodeActionKinds = [vscode.CodeActionKind.QuickFix];
@@ -21,11 +22,11 @@ class CaltCodeActionProvider implements vscode.CodeActionProvider {
       const report = await runFullScan(agent, config);
       const flat = report.categories.flatMap((c) => c.results);
       const fixable = flat.filter((r) => !r.passed && r.fix);
-      if (fixable.length === 0) return [];
+      const aiFixable = flat.filter((r) => isAiFixable(r));
 
       const actions: vscode.CodeAction[] = [];
 
-      // Per-finding fix.
+      // Per-finding deterministic fix.
       for (const r of fixable) {
         const matchingDiag = caltDiagnostics.find(
           (d) => typeof d.code === "object" && (d.code as { value?: string }).value === r.ruleId,
@@ -43,7 +44,7 @@ class CaltCodeActionProvider implements vscode.CodeActionProvider {
         actions.push(action);
       }
 
-      // "Fix all" action when ≥ 2 fixable findings exist.
+      // "Fix all" deterministic action when ≥ 2 fixable findings exist.
       if (fixable.length >= 2) {
         const fixed = applyFixes(agent.manifest, fixable);
         if (fixed.applied.length > 0) {
@@ -55,6 +56,15 @@ class CaltCodeActionProvider implements vscode.CodeActionProvider {
           action.edit = buildWorkspaceEdit(document, fixed.manifest);
           actions.push(action);
         }
+      }
+
+      // AI fix actions for rules without a deterministic fixer.
+      for (const r of aiFixable) {
+        const matchingDiag = caltDiagnostics.find(
+          (d) => typeof d.code === "object" && (d.code as { value?: string }).value === r.ruleId,
+        );
+        if (!matchingDiag) continue;
+        actions.push(buildAiFixAction(document, matchingDiag, r.ruleId));
       }
 
       return actions;

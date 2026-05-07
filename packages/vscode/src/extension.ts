@@ -8,6 +8,8 @@ import { registerCiWorkflowCommand } from "./ciWorkflow.js";
 import { registerTaskProvider } from "./taskProvider.js";
 import { registerScanCommands } from "./scanCommands.js";
 import { autoDetectProject } from "./autoDetect.js";
+import { registerAiFix } from "./aiFix.js";
+import { registerChatParticipant, registerApplyStartersCommand } from "./chatParticipant.js";
 import { getOutput } from "./output.js";
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
@@ -22,6 +24,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   registerCiWorkflowCommand(context);
   registerTaskProvider(context);
   registerScanCommands(context, diag);
+  registerAiFix(context);
+  registerApplyStartersCommand(context);
+  registerChatParticipant(context);
 
   context.subscriptions.push(
     vscode.commands.registerCommand("calt.showOutput", () => out.show(true)),

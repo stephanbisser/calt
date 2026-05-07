@@ -2,7 +2,7 @@
   "name": "calt-vscode",
   "displayName": "CALT — Copilot Agent Lint Tool",
   "description": "Lint, validate, and analyze Microsoft 365 Copilot Agent manifests directly in VS Code.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "stephanbisser",
   "license": "MIT",
   "repository": {
@@ -19,6 +19,8 @@
   },
   "categories": [
     "Linters",
+    "AI",
+    "Chat",
     "Other"
   ],
   "keywords": [
@@ -34,6 +36,7 @@
   "activationEvents": [
     "onLanguage:json",
     "onLanguage:jsonc",
+    "onChatParticipant:calt.chat",
     "workspaceContains:**/declarativeAgent*.json",
     "workspaceContains:**/appPackage/manifest.json",
     "workspaceContains:**/appPackage/declarativeAgent*.json",
@@ -70,6 +73,53 @@
         "command": "calt.showVersion",
         "title": "CALT: Show Extension Version",
         "category": "CALT"
+      },
+      {
+        "command": "calt.fixWithCopilot",
+        "title": "CALT: Fix Finding with Copilot",
+        "category": "CALT",
+        "enablement": "false"
+      },
+      {
+        "command": "calt.applyStarters",
+        "title": "CALT: Apply Generated Starters",
+        "category": "CALT",
+        "enablement": "false"
+      }
+    ],
+    "chatParticipants": [
+      {
+        "id": "calt.chat",
+        "name": "calt",
+        "fullName": "CALT",
+        "description": "Lint and improve Microsoft 365 Copilot Agent manifests with CALT.",
+        "isSticky": true,
+        "commands": [
+          {
+            "name": "scan",
+            "description": "Lint the active manifest and report findings."
+          },
+          {
+            "name": "fix",
+            "description": "Apply deterministic and AI-assisted fixes to the active manifest."
+          },
+          {
+            "name": "explain",
+            "description": "Explain a CALT rule (e.g. /explain SEC-PI-001)."
+          },
+          {
+            "name": "improve-instruction",
+            "description": "Rewrite the agent instructions for clarity and rule compliance."
+          },
+          {
+            "name": "generate-starters",
+            "description": "Propose conversation starters from the agent's role and capabilities."
+          },
+          {
+            "name": "audit-security",
+            "description": "Audit OWASP LLM Top 10 findings and suggest guardrails."
+          }
+        ]
       }
     ],
     "configuration": {

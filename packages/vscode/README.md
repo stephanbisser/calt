@@ -5,7 +5,9 @@ VS Code. CALT brings the same 35+ rules used by the [`calt` CLI](https://github.
 into the editor: live diagnostics, schema-aware IntelliSense, quick-fixes,
 and a status-bar health score.
 
-## Features (Phase 1)
+## Features
+
+### Phase 1 — Foundation
 
 | Feature | Description |
 |---------|-------------|
@@ -19,6 +21,20 @@ and a status-bar health score.
 | **Tasks** | `CALT: scan / fix / fix --dry-run / watch` registered with VS Code's task runner. |
 | **Auto-detection** | M365 Agents Toolkit and Teams Toolkit projects are detected on workspace open and offered linting. |
 | **Walkthrough** | A 5-step Getting Started flow takes new users from manifest to CI-gated deploy. |
+
+### Phase 2 — AI
+
+| Feature | Description |
+|---------|-------------|
+| **`@calt` Chat Participant** | Open Copilot Chat and mention `@calt` to use slash commands: `/scan`, `/fix`, `/explain <ruleId>`, `/improve-instruction`, `/generate-starters`, `/audit-security`. Streaming responses with executable buttons. |
+| **AI Auto-Fix** | A second quick-fix lightbulb — **Fix with Copilot** — appears for findings without a deterministic `FixDescriptor` (e.g. `INST-LANG-*`, `SEC-PI-*`). The LM rewrites the `instructions` field; CALT re-validates before applying. |
+| **Instruction Rewrite** | `/improve-instruction` rewrites the active manifest's instructions using current findings as constraints (length range, OWASP guardrails, capability alignment). |
+| **Starter Generator** | `/generate-starters` proposes 4–6 conversation starters from the agent's name, description, and instructions; one-click apply. |
+| **Security Audit** | `/audit-security` walks each `SEC-*` finding and uses the LM to map it to OWASP LLM Top 10 + suggest concrete guardrail clauses. Hover any `SEC-*` underline for a "Why is this risky?" link. |
+| **Plain-language summaries (D3)** | Set `calt.persona` to `maker` for friendly explanations (or `ciso` for OWASP-tagged messages). Pro-Code persona keeps the terse rule-IDed text. |
+
+GitHub Copilot subscription is required for AI features. Without it, deterministic
+fixes, diagnostics, and the static parts of the chat participant still work.
 
 ## Settings
 
