@@ -1,0 +1,227 @@
+{
+  "name": "calt-vscode",
+  "displayName": "CALT — Copilot Agent Lint Tool",
+  "description": "Lint, validate, and analyze Microsoft 365 Copilot Agent manifests directly in VS Code.",
+  "version": "0.1.0",
+  "publisher": "stephanbisser",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stephanbisser/calt.git",
+    "directory": "packages/vscode"
+  },
+  "homepage": "https://github.com/stephanbisser/calt#readme",
+  "bugs": {
+    "url": "https://github.com/stephanbisser/calt/issues"
+  },
+  "engines": {
+    "vscode": "^1.94.0"
+  },
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "microsoft-365",
+    "copilot",
+    "declarative-agent",
+    "agents-toolkit",
+    "copilot-studio",
+    "linter"
+  ],
+  "type": "module",
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onLanguage:json",
+    "onLanguage:jsonc",
+    "workspaceContains:**/declarativeAgent*.json",
+    "workspaceContains:**/appPackage/manifest.json",
+    "workspaceContains:**/appPackage/declarativeAgent*.json",
+    "workspaceContains:.caltrc.json"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "calt.scan",
+        "title": "CALT: Scan Active Manifest",
+        "category": "CALT"
+      },
+      {
+        "command": "calt.scanWorkspace",
+        "title": "CALT: Scan Workspace",
+        "category": "CALT"
+      },
+      {
+        "command": "calt.initConfig",
+        "title": "CALT: Initialize Config (.caltrc.json)",
+        "category": "CALT"
+      },
+      {
+        "command": "calt.generateCiWorkflow",
+        "title": "CALT: Generate CI Workflow",
+        "category": "CALT"
+      },
+      {
+        "command": "calt.showOutput",
+        "title": "CALT: Show Output Channel",
+        "category": "CALT"
+      },
+      {
+        "command": "calt.showVersion",
+        "title": "CALT: Show Extension Version",
+        "category": "CALT"
+      }
+    ],
+    "configuration": {
+      "title": "CALT",
+      "properties": {
+        "calt.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable CALT live diagnostics."
+        },
+        "calt.run": {
+          "type": "string",
+          "enum": [
+            "onSave",
+            "onType"
+          ],
+          "default": "onSave",
+          "description": "When to run CALT scans against open manifests."
+        },
+        "calt.debounceMs": {
+          "type": "number",
+          "default": 500,
+          "description": "Debounce window (ms) before re-scanning when 'calt.run' is 'onType'."
+        },
+        "calt.persona": {
+          "type": "string",
+          "enum": [
+            "pro-code",
+            "maker",
+            "ciso"
+          ],
+          "default": "pro-code",
+          "description": "Persona used for rule descriptions and dashboards (D3)."
+        }
+      }
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": [
+          "**/declarativeAgent*.json",
+          "**/appPackage/declarativeAgent*.json",
+          "**/declarative-agent*.json"
+        ],
+        "url": "./schemas/v1.6.json"
+      },
+      {
+        "fileMatch": [
+          ".caltrc.json"
+        ],
+        "url": "./schemas/config.schema.json"
+      }
+    ],
+    "taskDefinitions": [
+      {
+        "type": "calt",
+        "required": [
+          "task"
+        ],
+        "properties": {
+          "task": {
+            "type": "string",
+            "enum": [
+              "scan",
+              "fix",
+              "fix-dry-run",
+              "watch",
+              "diff"
+            ],
+            "description": "The CALT CLI task to run."
+          },
+          "path": {
+            "type": "string",
+            "description": "Path to manifest file or project directory."
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "terminal",
+              "json",
+              "markdown",
+              "html",
+              "sarif"
+            ],
+            "description": "Output format for the scan."
+          }
+        }
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "calt.firstAgent",
+        "title": "Build Your First Copilot Agent with CALT",
+        "description": "From manifest to validated, deployable agent in five steps.",
+        "steps": [
+          {
+            "id": "calt.firstAgent.init",
+            "title": "Initialize a CALT config",
+            "description": "Create a `.caltrc.json` to share rule severities and tenant defaults across your team.\n[Run: CALT: Initialize Config](command:calt.initConfig)",
+            "media": {
+              "markdown": "walkthroughs/01-init.md"
+            }
+          },
+          {
+            "id": "calt.firstAgent.scan",
+            "title": "Scan your manifest",
+            "description": "Open a `declarativeAgent.json` file. CALT will lint it on save.\n[Run: CALT: Scan Active Manifest](command:calt.scan)",
+            "media": {
+              "markdown": "walkthroughs/02-scan.md"
+            }
+          },
+          {
+            "id": "calt.firstAgent.fix",
+            "title": "Apply quick-fixes",
+            "description": "Hover over any underline; the lightbulb offers deterministic fixes.",
+            "media": {
+              "markdown": "walkthroughs/03-fix.md"
+            }
+          },
+          {
+            "id": "calt.firstAgent.ci",
+            "title": "Generate a CI workflow",
+            "description": "Wire CALT into GitHub Actions with one command.\n[Run: CALT: Generate CI Workflow](command:calt.generateCiWorkflow)",
+            "media": {
+              "markdown": "walkthroughs/04-ci.md"
+            }
+          },
+          {
+            "id": "calt.firstAgent.deploy",
+            "title": "Deploy to your tenant",
+            "description": "Use the M365 Agents Toolkit's provision flow — CALT will gate it on errors.",
+            "media": {
+              "markdown": "walkthroughs/05-deploy.md"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "vsce package --no-dependencies",
+    "lint": "eslint src/",
+    "vscode:prepublish": "node esbuild.js --production"
+  },
+  "dependencies": {
+    "calt-cli": "file:../.."
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.5.0"
+  }
+}

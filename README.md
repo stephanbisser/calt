@@ -13,6 +13,15 @@ npm install -g calt-cli          # 1. Install
 calt scan ./declarativeAgent.json # 2. Scan — done!
 ```
 
+## VS Code Extension (preview)
+
+Working on agents inside VS Code? The [`calt-vscode` extension](packages/vscode/README.md)
+brings live diagnostics, schema-aware IntelliSense, quick-fixes, a status-bar
+health score, an init-config wizard, and a CI-workflow generator straight into
+the editor — with auto-detection for Microsoft 365 Agents Toolkit projects.
+See [ROADMAP.md](ROADMAP.md) for the longer-term vision (AI auto-fixes,
+`@calt` Copilot Chat participant, MCP server, tenant governance dashboards).
+
 ## Quick Start
 
 ```bash
