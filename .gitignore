@@ -14,3 +14,8 @@ docs/
 # Local eval state and HAR captures
 .calt/
 *.har
+
+# Workspace package build artifacts
+packages/*/out/
+packages/*/schemas/
+packages/*/*.vsix

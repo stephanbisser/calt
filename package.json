@@ -52,6 +52,9 @@
     "!dist/**/*.js.map",
     "!dist/**/*.d.ts.map"
   ],
+  "workspaces": [
+    "packages/*"
+  ],
   "dependencies": {
     "@azure/msal-node": "^2.16.0",
     "ajv": "^8.17.0",
